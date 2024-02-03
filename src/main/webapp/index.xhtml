@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <h:head>
+        <title>Pet-Store</title>
+    </h:head>
+
+    <h:body>
+        <h1>Welcome</h1>
+
+        <h:form>
+        	<h:outputLabel>Sign in</h:outputLabel>
+        	<br/>
+            <h:outputLabel for="userName">Enter Your Username:</h:outputLabel>
+            <h:inputText id="userName" required="true" value="#{loginBean.username}" requiredMessage="Required"/>
+            <h:message for="userName" style="color:red">
+            	
+            </h:message>
+            <br/>
+            <h:outputLabel for="userName">Enter Your Password:</h:outputLabel>
+			<h:inputSecret id="password" required="true" value="#{loginBean.password}" requiredMessage="Required" />
+			<h:message for="password"  style="color:red">
+				
+			</h:message>
+            <br/>
+
+            <h:commandButton value="Login" action="welcome" />
+
+            <br/>
+        </h:form>
+        <h:form>
+        	<br/>
+        	<h:outputLabel>Not a member? Register or Continue as quest</h:outputLabel>
+        	<br/>
+			<h:commandButton value="Register" action="register.xhtml?faces-redirect=true" />
+			<br/>
+			<h:commandButton value="Continue as guest" action="view_pets" />
+            
+        </h:form>
+    </h:body>
+
+</html>

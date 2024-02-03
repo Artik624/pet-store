@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <h:head>
+        <title>Pet-Store</title>
+         <link rel="stylesheet" type="text/css" href="style.css" />
+               <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    		<meta http-equiv="Pragma" content="no-cache" />
+    		<meta http-equiv="Expires" content="0" />
+    </h:head>
+       <h1>Welcome</h1>
+	<br/>
+
+    <h:body>
+    <div style="width:900px; margin:auto; align:right">
+        <h:form >
+        	<h:outputLabel>Fill your details</h:outputLabel>
+        	<br/>
+        	<div style="display: inline-block; text-align: left;">
+	            <h:outputLabel for="firstName">Enter Your First Name:</h:outputLabel>
+	            <h:inputText id="firstName"  required="true" validator="#{registerBean.validateFirstName}" requiredMessage="Required" />
+	            <h:message for="firstName" styleClass="#{registerBean.isFirstNameValid ? 'validMessage' : 'invalidMessage'}"/>
+        	</div>
+            <br/>
+        	
+        	<div style="display: inline-block; text-align: left;">
+	            <h:outputLabel for="lastName">Enter Your Last Name:</h:outputLabel>
+	            <h:inputText id="lastName"  required="true" validator="#{registerBean.validateLastName}" requiredMessage="Required"/>
+	            <h:message for="lastName" styleClass="#{registerBean.isLastNameValid ? 'validMessage' : 'invalidMessage'}"/>
+        	
+        	
+        	</div>
+            
+            
+            <br/>
+            <h:outputLabel for="password">Enter Your Password:</h:outputLabel>
+            <h:inputText id="password"  required="true" validator="#{registerBean.validatePassword}" requiredMessage="Required"/>
+            <h:message for="password" styleClass="#{registerBean.isPasswordValid ? 'validMessage' : 'invalidMessage'}"/>
+            
+            <br/>
+            <h:outputLabel for="email">Enter Your Email:</h:outputLabel>
+            <h:inputText id="email"  required="true" validator="#{registerBean.validateEmail}" requiredMessage="Required"/>
+            <h:message for="email" styleClass="#{registerBean.isEmailValid ? 'validMessage' : 'invalidMessage'}" />
+            
+            <br/>
+            <h:outputLabel for="phone">Enter Your Phone Number:</h:outputLabel>
+            <h:inputText id="phone"  required="true" validator="#{registerBean.validatePhone}" requiredMessage="Required"/>
+            <h:message for="phone" styleClass="#{registerBean.isPhoneValid ? 'validMessage' : 'invalidMessage'}"/>
+            
+            <br/>
+            <h:outputLabel for="city">Enter Your City:</h:outputLabel>
+            <h:inputText id="city"  required="true" validator="#{registerBean.validateCity}" requiredMessage="Required"/>
+            <h:message for="city" styleClass="#{registerBean.isCityValid ? 'validMessage' : 'invalidMessage'}" />
+            
+            <br/>
+            <h:outputLabel for="street">Enter Your Street Name:</h:outputLabel>
+            <h:inputText id="street"  required="true" validator="#{registerBean.validateStreet}" requiredMessage="Required"/>
+            <h:message for="street" styleClass="#{registerBean.isStreetValid ? 'validMessage' : 'invalidMessage'}"/>
+            
+            <br/>
+            <h:outputLabel for="streetNum">Enter Your Street Number:</h:outputLabel>
+            <h:inputText id="streetNum"  required="true" validator="#{registerBean.validateStreetNumber}" requiredMessage="Required"/>
+            <h:message for="streetNum" styleClass="#{registerBean.isStreetNumberValid ? 'validMessage' : 'invalidMessage'}"/>
+            
+            <br/>
+            <h:outputText id="registerMsg" value="#{registerBean.registerMessage}"></h:outputText>
+            <br/>
+            <h:commandButton id="submitBtn" value="Submit" action="#{registerBean.createUser}" ></h:commandButton>
+            
+             
+            
+        </h:form>
+        <h:form>
+            <br/> 
+            <h:commandButton id="backBtn" value="Back" action="index.xhtml?faces-redirect=true"></h:commandButton>
+        </h:form>
+    
+    </div>
+    </h:body>
+
+</html>
