@@ -9,7 +9,6 @@ import javax.faces.context.FacesContext;
 
 @SuppressWarnings("deprecation")
 @ManagedBean
-@ViewScoped
 public class RegisterBean {
 
 	private final int MAX_NAME_LENGTH = 10;
@@ -154,9 +153,9 @@ public class RegisterBean {
 			isLastNameValid = false;
 			message = new FacesMessage("Last Name can only contain letters");
 		}
-		else if(lastName.length() > MAX_NAME_LENGTH || lastName.length() < 2) {
+		else if(lastName.length() > MAX_NAME_LENGTH || lastName.length() < MIN_NAME_LENGTH) {
 			isLastNameValid = false;
-			message = new FacesMessage(String.format("Name cannot be longer than %d and shorter than %d Character", MIN_NAME_LENGTH, MAX_NAME_LENGTH));
+			message = new FacesMessage(String.format("Name cannot be longer than %d and shorter than %d Character", MAX_NAME_LENGTH, MIN_NAME_LENGTH));
 		}
 		else{
 			isLastNameValid = true;
@@ -280,16 +279,20 @@ public class RegisterBean {
 	public String createUser() {
 		if(isFirstNameValid && isLastNameValid && isPasswordValid && isEmailValid && isPhoneValid && isCityValid && isStreetValid & isStreetNumberValid) {
 			System.out.println("Registering User");
-			
-			User user = new User(firstName, lastName, firstName, email, phone, city, street, streetNumber); 
-			if (user.sendToDB()) {
-				setRegisterMessage("Success, User Registered, you will be redirected to main page for log in ");
+			try {
+				User user = new User("",firstName, lastName, password, email, phone, city, street, streetNumber); 
+				if (user.sendToDB()) {
+					setRegisterMessage("Success, User Registered, you will be redirected to main page for log in ");
+					
+					return "index.xhtml?faces-redirect=true";
+				}
+				else {
+					setRegisterMessage("Error");
+					return "index.xhtml?faces-redirect=true";
+				}
 				
-				return "index.xhtml?faces-redirect=true";
-			}
-			else {
-				setRegisterMessage("Error");
-				return "index.xhtml?faces-redirect=true";
+			} catch (Exception e) {
+				setRegisterMessage(e.toString());
 			}
 				
 			

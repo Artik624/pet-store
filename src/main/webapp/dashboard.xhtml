@@ -1,14 +1,91 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html">
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
       
       <h:head>
-      
+      <title>Dashboard</title>
       
       </h:head>
       <h:body>
-      
-      
+	      <h:form>
+	      	<h:outputText value="Welcome, #{dashboardBean.firstName}"></h:outputText>
+	      </h:form>
+	      
+	      <h:form enctype="multipart/form-data">
+	      	<br/>
+			<h:commandButton id="addPet" value="Add pet" action="#{dashboardBean.addPet}"> </h:commandButton>      
+	      	<br/>
+			<h:commandButton value="Remove pet"></h:commandButton>      
+	      	<br/>
+	      	
+	        <h:panelGroup rendered="#{dashboardBean.showAddPet}">
+	        
+		        <h:outputLabel for="petName">Enter pet name: </h:outputLabel>
+		        <h:inputText id="petName" required="true" validator="#{dashboardBean.petNameValidator}" value="#{dashboardBean.petName}"></h:inputText>
+		        <h:message for="petName"/>
+		        <br/>
+		        
+		        <h:outputLabel for="petGender">Choose pet gender: </h:outputLabel>
+		        <h:selectOneMenu  value="#{dashboardBean.petGender}">
+		        	<f:selectItems value="#{dashboardBean.gendersOptions}" />
+		        </h:selectOneMenu>
+		        <br/>
+		        
+		       <h:outputLabel for="petCategory">Choose pet category: </h:outputLabel>
+	            <h:selectOneMenu id="petCategory" value="#{dashboardBean.petCategory}">
+	                <f:selectItems value="#{dashboardBean.categoriesOptions}" />
+	            </h:selectOneMenu>
+	            <br/>
+	            
+		        <h:outputLabel for="petAge">Enter pet age: </h:outputLabel>
+	           	<h:selectOneMenu id="petAge" value="#{dashboardBean.petAge}">
+	                <f:selectItems value="#{dashboardBean.sizeOptions}" />
+	            </h:selectOneMenu>
+	            <br/>
+	           	
+		        <h:outputLabel for="petHeight">Enter pet height: </h:outputLabel>
+	           	<h:selectOneMenu id="petHeight" value="#{dashboardBean.petHeight}">
+	                <f:selectItems value="#{dashboardBean.sizeOptions}" />
+	            </h:selectOneMenu>
+	            <br/>
+		        
+		        <h:outputLabel for="petWeight">Enter pet weight: </h:outputLabel>
+	           	<h:selectOneMenu id="petWeight" value="#{dashboardBean.petWeight}">
+	                <f:selectItems value="#{dashboardBean.sizeOptions}" />
+	            </h:selectOneMenu>
+	            <br/>
+		        
+		        <h:outputLabel for="petLength">Enter pet length: </h:outputLabel>
+	           	<h:selectOneMenu id="petLength" value="#{dashboardBean.petLength}">
+	                <f:selectItems value="#{dashboardBean.sizeOptions}" />
+	            </h:selectOneMenu>
+	            <br/>
+		        
+		        <h:outputLabel for="petShortDesc">Enter short description of the pet: </h:outputLabel>
+	           	<h:inputTextarea id="petShortDesc" value="#{dashboardBean.shortDescription}" required="true" ></h:inputTextarea>
+	           	
+		        <br/>
+		        
+		        <h:outputLabel for="petFullDesc">Enter full description of the pet: </h:outputLabel>
+	           	<h:inputTextarea id="petFullDesc" value="#{dashboardBean.fullDescription}" required="true" ></h:inputTextarea>
+	           	
+		        <br/>
+		        
+		        <h:outputLabel for="petPhoto">Choose photo of the pet: </h:outputLabel>
+	           	<h:inputFile id="petPhoto" value="#{dashboardBean.petPhoto}" required="true" ></h:inputFile>
+	           	
+		        <br/>
+		        
+		        
+		        
+		        
+		        <h:commandButton id="submitPet" value="Submit" action="#{dashboardBean.addNewPet}"></h:commandButton>
+		        
+	        </h:panelGroup>
+	       </h:form>
+	      
       </h:body>
       
       

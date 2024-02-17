@@ -1,13 +1,12 @@
 package pet_store;
-import at.favre.lib.crypto.bcrypt.BCrypt;
+import org.mindrot.jbcrypt.BCrypt;
 
+import java.util.List;
 import java.util.UUID;
-
-//import org.hibernate.annotations.Entity;
-//import javax.persistence.Entity;
+import javax.faces.bean.SessionScoped;
 
 
-
+@SuppressWarnings("deprecation")
 public class User {
 	private String id;
 	private String firstName;
@@ -19,36 +18,60 @@ public class User {
 	private String street; 
 	private int streetNumber;
 	
-	private static DbManager dbLink = DbManager.getDbManagerINstance();
+	private static DbManager dbLink = DbManager.getDbManagerInstance();
 	
 	
 
-	public User(String firstName, 
+	public User(String id,
+				String firstName, 
 				String lastName, 
 				String password, 
 				String email, 
 				int phone, 
 				String city, 
 				String street, 
-				int streetNumber) {
+				int streetNumber) throws Exception {
 		
 		
 		this.id = generateUUID();
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.password = User.getHashPassword(password);
+		this.password = password;
 		this.phone = phone;
 		this.email = email;
 		this.city = city;
 		this.street = street;
 		this.streetNumber = streetNumber;
 		
+		this.password = User.getHashPassword(this.password);
+		if(this.password == "" || !this.password.startsWith("$2a$"))
+			throw new Exception("Error creating user");
 		
 		String s = String.format("User created with ID %s, name %s %s", id, firstName, lastName);
 		System.out.println(s);
 	}
 	
-	private String generateUUID() {
+	public User(String uuid,
+			String firstName, 
+			String lastName,  
+			String email, 
+			int phone, 
+			String city, 
+			String street, 
+			int streetNumber) {
+		
+		this.id = uuid;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.phone = phone;
+		this.email = email;
+		this.city = city;
+		this.street = street;
+		this.streetNumber = streetNumber;
+		
+	}
+	
+	protected static String generateUUID() {
 		UUID uuid = UUID.randomUUID();
 		return uuid.toString();
 	}
@@ -131,16 +154,20 @@ public class User {
 		return false;
 	}
 	
+	
 	public static String getHashPassword(String password) {
-        String hashedPassword = BCrypt.withDefaults().hashToString(12, password.toCharArray());
 
-        return hashedPassword;
+		String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+		if(password != null && hashedPassword != null)
+			return hashedPassword;
+		return "";
 	}
 	
-	public static boolean checkHashedPassword(String password, String hashedPassword) {
-		
-        BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(), hashedPassword);
-        return result.verified;
+	public static boolean authenticatePassword(String password, String email) {
+        
+		String hashedPassword = dbLink.getHashedPassword(email);
+		boolean result = BCrypt.checkpw(password, hashedPassword);
+        return result;
 	}
 	
 	public static boolean checkUserEmailExists(String email) {
@@ -148,6 +175,14 @@ public class User {
 		
 	}
 	
+	public static User getUser(String email) {
+		return dbLink.getUser(email);
+	}
+	
+	public List<String> getPetCategories(){
+		//System.out.println("geting categories in User ");
+		return dbLink.getCategories();
+	}
 	
 	
 }

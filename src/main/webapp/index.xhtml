@@ -4,6 +4,7 @@
 
     <h:head>
         <title>Pet-Store</title>
+        <link rel="stylesheet" type="text/css" href="style.css" />
     </h:head>
 
     <h:body>
@@ -12,22 +13,24 @@
         <h:form>
         	<h:outputLabel>Sign in</h:outputLabel>
         	<br/>
-            <h:outputLabel for="userName">Enter Your Username:</h:outputLabel>
-            <h:inputText id="userName" required="true" value="#{loginBean.username}" requiredMessage="Required"/>
-            <h:message for="userName" style="color:red">
+            <h:outputLabel for="email">Enter Your Email: </h:outputLabel>
+            <h:inputText id="email" required="true" value="#{loginBean.email}" validator="#{loginBean.validateEmail}" requiredMessage="Required"/>
+            <h:message for="email" styleClass="#{loginBean.isEmailValid ? 'validMessage' : 'invalidMessage'}"/>
             	
-            </h:message>
+            
             <br/>
-            <h:outputLabel for="userName">Enter Your Password:</h:outputLabel>
+            <h:outputLabel for="password">Enter Your Password: </h:outputLabel>
 			<h:inputSecret id="password" required="true" value="#{loginBean.password}" requiredMessage="Required" />
-			<h:message for="password"  style="color:red">
+			<h:message for="password" styleClass="#{loginBean.isPasswordValid ? 'validMessage' : 'invalidMessage'}"/>
 				
-			</h:message>
+			
             <br/>
 
-            <h:commandButton value="Login" action="welcome" />
-
+            <h:commandButton id="loginBtn" value="Login" action="#{loginBean.validateLogin}" />
             <br/>
+            <h:outputLabel value="#{loginBean.loginMessage}" styleClass="#{loginBean.isLoginValid ? 'validMessage' : 'invalidMessage'}"></h:outputLabel>
+            <h:message for="loginBtn" styleClass="loginBean.isLoginValid ? 'validMessage' : 'invalidMessage'}"/>
+            
         </h:form>
         <h:form>
         	<br/>
