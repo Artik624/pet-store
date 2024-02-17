@@ -195,6 +195,13 @@ public class Pet {
 		return false;
 	}
 	
+	public static void removePet(String petName, String ownerID) {
+		dbLink.removePet(petName, ownerID);
+		System.out.println("Pet removed : " + petName +", " + ownerID);
+			
+		
+	}
+	
 
 
 	

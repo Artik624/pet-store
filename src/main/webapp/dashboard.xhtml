@@ -13,12 +13,34 @@
 	      	<h:outputText value="Welcome, #{dashboardBean.firstName}"></h:outputText>
 	      </h:form>
 	      
+	       <h:form>
+	      	<h:panelGrid columns="1" border="1">
+	      		<h:outputText value="Pet Name:" />
+	            <ui:repeat value="#{dashboardBean.petsList}" var="pet">
+	                <h:panelGrid columns="1" >
+		            	<h:outputText value="#{pet}" />
+		            	
+		        	</h:panelGrid>
+	                <h:panelGrid columns="1" style="border-bottom: 1px solid black;">
+		            	
+		            	<h:commandButton value="Remove pet" action="#{dashboardBean.removePet}">
+		            		<f:param name="petName" value="#{pet}" />
+		            	</h:commandButton>
+		        	</h:panelGrid>
+	            </ui:repeat>
+       			 
+	      	</h:panelGrid>
+	      
+	      </h:form>
+	      
+	      
 	      <h:form enctype="multipart/form-data">
 	      	<br/>
 			<h:commandButton id="addPet" value="Add pet" action="#{dashboardBean.addPet}"> </h:commandButton>      
 	      	<br/>
-			<h:commandButton value="Remove pet"></h:commandButton>      
-	      	<br/>
+			
+	      	
+	      	
 	      	
 	        <h:panelGroup rendered="#{dashboardBean.showAddPet}">
 	        

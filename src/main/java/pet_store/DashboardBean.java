@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -293,7 +294,23 @@ public class DashboardBean {
         }
     }
 	
+	public List<String> getPetsList(){
+		if(user != null) {
+			List<String> pets = user.getPetsList();
+			System.out.println(pets.toString());
+			return pets;
+			
+		}
+		return null;
+	}
 	
+	
+	public void removePet() {
+		Map<String,String> params = externalContext.getRequestParameterMap();
+		String petName = params.get("petName");
+		System.out.println("test remove pet : " + petName);
+		Pet.removePet(petName, user.getId());
+	}
 	
 	
 	

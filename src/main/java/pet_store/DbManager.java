@@ -203,4 +203,37 @@ public  class DbManager implements AutoCloseable {
 		}
 		return rowsAffected;
 	}
+	
+	protected List<String> getPetsByOwnerID(String owner_id){
+		List<String> pets = new ArrayList<String>();
+		String getPetSql = "SELECT name FROM \"pets\" WHERE owner_id=?";
+		try(PreparedStatement statement = con.prepareStatement(getPetSql)){
+			statement.setString(1, owner_id);
+			ResultSet resultSet = statement.executeQuery();
+			while(resultSet.next()) {
+	              pets.add(resultSet.getString(1));
+	              
+	        }
+		}
+		catch (Exception e){
+			System.out.println("Exception in get category ID : " + e);
+			return null;
+		}
+		return pets;
+	}
+	
+	protected void removePet(String petName, String ownerID) {
+		String removePetSql = "DELETE FROM \"pets\" WHERE owner_id=? AND name=?";
+		int rowsAffected = 0;
+		try(PreparedStatement statement = con.prepareStatement(removePetSql)){
+			statement.setString(1, ownerID);
+			statement.setString(2, petName);
+			statement.executeQuery();
+			
+		}
+		catch (Exception e){
+			System.out.println("Exception in Remove Pet  : " + e);
+			
+		}
+	}
 }
