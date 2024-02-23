@@ -14,19 +14,26 @@
 	      </h:form>
 	      
 	       <h:form>
-	      	<h:panelGrid columns="1" border="1">
-	      		<h:outputText value="Pet Name:" />
-	            <ui:repeat value="#{dashboardBean.petsList}" var="pet">
-	                <h:panelGrid columns="1" >
-		            	<h:outputText value="#{pet}" />
-		            	
+	      	<h:panelGrid columns="2" border="1" cellpadding = "10" cellspacing = "1">
+	      		<f:facet name = "header">
+               		<h:outputText value = "Your Pets"/>
+               </f:facet>
+               
+	            <ui:repeat value="#{dashboardBean.petsList}" var="pet" >
+	                <h:panelGrid columns="1" cellpadding = "5"  style="border:1px solid black; margin-bottom:10px;">
+	                	<f:facet name = "header">
+               				<h:outputText value = "Name: #{pet.name}"/>
+               			</f:facet>
+		            	<h:outputText value="Age: #{pet.age}" />
+		            	<h:outputText value="Gender: #{pet.genderString}" />
+		            	  <f:facet name = "footer">
+		            	  	<h:commandButton value="Remove pet" action="#{dashboardBean.removePet}">
+		            			<f:param name="petName" value="#{pet.name}" />
+		            		</h:commandButton>
+		            	  
+		            	  </f:facet>
 		        	</h:panelGrid>
-	                <h:panelGrid columns="1" style="border-bottom: 1px solid black;">
-		            	
-		            	<h:commandButton value="Remove pet" action="#{dashboardBean.removePet}">
-		            		<f:param name="petName" value="#{pet}" />
-		            	</h:commandButton>
-		        	</h:panelGrid>
+	                
 	            </ui:repeat>
        			 
 	      	</h:panelGrid>
@@ -34,64 +41,61 @@
 	      </h:form>
 	      
 	      
-	      <h:form enctype="multipart/form-data">
+	      <h:form id="addPetForm" enctype="multipart/form-data">
 	      	<br/>
 			<h:commandButton id="addPet" value="Add pet" action="#{dashboardBean.addPet}"> </h:commandButton>      
 	      	<br/>
-			
-	      	
-	      	
 	      	
 	        <h:panelGroup rendered="#{dashboardBean.showAddPet}">
 	        
 		        <h:outputLabel for="petName">Enter pet name: </h:outputLabel>
-		        <h:inputText id="petName" required="true" validator="#{dashboardBean.petNameValidator}" value="#{dashboardBean.petName}"></h:inputText>
+		        <h:inputText id="petName" required="true" validator="#{dashboardBean.petNameValidator}" resetInput="true"></h:inputText>
 		        <h:message for="petName"/>
 		        <br/>
 		        
 		        <h:outputLabel for="petGender">Choose pet gender: </h:outputLabel>
-		        <h:selectOneMenu  value="#{dashboardBean.petGender}">
+		        <h:selectOneMenu  value="#{dashboardBean.petGender}" resetInput="true">
 		        	<f:selectItems value="#{dashboardBean.gendersOptions}" />
 		        </h:selectOneMenu>
 		        <br/>
 		        
 		       <h:outputLabel for="petCategory">Choose pet category: </h:outputLabel>
-	            <h:selectOneMenu id="petCategory" value="#{dashboardBean.petCategory}">
+	            <h:selectOneMenu id="petCategory" value="#{dashboardBean.petCategory}" resetInput="true">
 	                <f:selectItems value="#{dashboardBean.categoriesOptions}" />
 	            </h:selectOneMenu>
 	            <br/>
 	            
 		        <h:outputLabel for="petAge">Enter pet age: </h:outputLabel>
-	           	<h:selectOneMenu id="petAge" value="#{dashboardBean.petAge}">
+	           	<h:selectOneMenu id="petAge" value="#{dashboardBean.petAge}" resetInput="true">
 	                <f:selectItems value="#{dashboardBean.sizeOptions}" />
 	            </h:selectOneMenu>
 	            <br/>
 	           	
 		        <h:outputLabel for="petHeight">Enter pet height: </h:outputLabel>
-	           	<h:selectOneMenu id="petHeight" value="#{dashboardBean.petHeight}">
+	           	<h:selectOneMenu id="petHeight" value="#{dashboardBean.petHeight}" resetInput="true">
 	                <f:selectItems value="#{dashboardBean.sizeOptions}" />
 	            </h:selectOneMenu>
 	            <br/>
 		        
 		        <h:outputLabel for="petWeight">Enter pet weight: </h:outputLabel>
-	           	<h:selectOneMenu id="petWeight" value="#{dashboardBean.petWeight}">
+	           	<h:selectOneMenu id="petWeight" value="#{dashboardBean.petWeight}" resetInput="true">
 	                <f:selectItems value="#{dashboardBean.sizeOptions}" />
 	            </h:selectOneMenu>
 	            <br/>
 		        
 		        <h:outputLabel for="petLength">Enter pet length: </h:outputLabel>
-	           	<h:selectOneMenu id="petLength" value="#{dashboardBean.petLength}">
+	           	<h:selectOneMenu id="petLength" value="#{dashboardBean.petLength}" resetInput="true">
 	                <f:selectItems value="#{dashboardBean.sizeOptions}" />
 	            </h:selectOneMenu>
 	            <br/>
 		        
 		        <h:outputLabel for="petShortDesc">Enter short description of the pet: </h:outputLabel>
-	           	<h:inputTextarea id="petShortDesc" value="#{dashboardBean.shortDescription}" required="true" ></h:inputTextarea>
+	           	<h:inputTextarea id="petShortDesc" value="#{dashboardBean.shortDescription}" required="true" resetInput="true"></h:inputTextarea>
 	           	
 		        <br/>
 		        
 		        <h:outputLabel for="petFullDesc">Enter full description of the pet: </h:outputLabel>
-	           	<h:inputTextarea id="petFullDesc" value="#{dashboardBean.fullDescription}" required="true" ></h:inputTextarea>
+	           	<h:inputTextarea id="petFullDesc" value="#{dashboardBean.fullDescription}" required="true" resetInput="true"></h:inputTextarea>
 	           	
 		        <br/>
 		        
@@ -103,7 +107,11 @@
 		        
 		        
 		        
-		        <h:commandButton id="submitPet" value="Submit" action="#{dashboardBean.addNewPet}"></h:commandButton>
+		        <h:commandButton id="submitPet" value="Submit" 
+		        action="#{dashboardBean.addNewPet}" >  
+		        	<f:resetValues render="addPetForm:petName"/>
+		        
+		        </h:commandButton>
 		        
 	        </h:panelGroup>
 	       </h:form>

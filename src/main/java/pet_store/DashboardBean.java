@@ -37,6 +37,7 @@ public class DashboardBean {
 	private String shortDescription;
 	private String fullDescription;
 	private Part petPhoto;
+	private List<Pet> petsList = (user != null ? user.getPetsList() : null);
 	
 	private int MIN_NAME_LENGTH = 2;
 	private int MAX_NAME_LENGTH = 10;
@@ -198,19 +199,25 @@ public class DashboardBean {
 		
 		String photoPath = uploadPhoto();
 		System.out.println("Photo path : "  + photoPath);
-		Pet newPet = new Pet(user.getId(), 
-							getPetCategory(), 
-							getPetName(), 
-							getPetGender(), 
-							getPetAge(), 
-							getPetWeight(), 
-							getPetHeight(), 
-							getPetLength(), 
-							getShortDescription(), 
-							getFullDescription(), 
-							photoPath);
+		if(getPetName() != null && getShortDescription() != null && getFullDescription() != null) {
+			Pet newPet = new Pet(user.getId(), 
+					getPetCategory(), 
+					getPetName(), 
+					getPetGender(), 
+					getPetAge(), 
+					getPetWeight(), 
+					getPetHeight(), 
+					getPetLength(), 
+					getShortDescription(), 
+					getFullDescription(), 
+					photoPath);
+			
+			newPet.sendToDb();
+			
+		}
 		
-		newPet.sendToDb();
+		setShortDescription("");
+		setFullDescription("");
 	}
 	
 	
@@ -294,21 +301,20 @@ public class DashboardBean {
         }
     }
 	
-	public List<String> getPetsList(){
-		if(user != null) {
-			List<String> pets = user.getPetsList();
-			System.out.println(pets.toString());
-			return pets;
-			
-		}
-		return null;
+	public List<Pet> getPetsList(){
+		petsList = (user != null ? user.getPetsList() : null);
+		return petsList;
+	}
+	
+	public int getNumberOfPets() {
+		return petsList.size();
 	}
 	
 	
 	public void removePet() {
 		Map<String,String> params = externalContext.getRequestParameterMap();
 		String petName = params.get("petName");
-		System.out.println("test remove pet : " + petName);
+		
 		Pet.removePet(petName, user.getId());
 	}
 	

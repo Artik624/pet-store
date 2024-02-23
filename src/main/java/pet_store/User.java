@@ -184,7 +184,7 @@ public class User {
 		return dbLink.getCategories();
 	}
 	
-	public List<String> getPetsList(){
+	public List<Pet> getPetsList(){
 		return dbLink.getPetsByOwnerID(this.getId());
 	}
 	

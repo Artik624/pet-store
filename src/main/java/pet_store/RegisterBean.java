@@ -183,7 +183,7 @@ public class RegisterBean {
 			isPasswordValid = true;
 			this.password = password;
 			message = new FacesMessage("Good");
-			this.password = password;
+			
 			
 		}
 		context.addMessage(comp.getClientId(context), message);

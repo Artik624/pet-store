@@ -1,5 +1,7 @@
 package pet_store;
 
+import java.io.File;
+
 public class Pet {
 
 	private static DbManager dbLink = DbManager.getDbManagerInstance();
@@ -48,6 +50,29 @@ public class Pet {
 		this.photo = photo;
 	}
 	
+	
+
+	public Pet(String id, String ownerId, int categoryId, String name, boolean gender, int age, int weight, int height,
+			int length, String shortDescritpion, String fullDescription, String photo) {
+		System.out.println("created pet ");
+		this.id = id;
+		this.ownerId = ownerId;
+		this.categoryId = categoryId;
+		this.name = name;
+		this.gender = gender;
+		this.age = age;
+		this.weight = weight;
+		this.height = height;
+		this.length = length;
+		this.shortDescritpion = shortDescritpion;
+		this.fullDescription = fullDescription;
+		this.photo = photo;
+	}
+
+
+
+
+
 	public String getId() {
 		return id;
 	}
@@ -86,10 +111,15 @@ public class Pet {
 		this.name = name;
 	}
 
-
-
 	public boolean getGender() {
 		return gender;
+		
+	}
+
+	public String getGenderString() {
+		if(gender)
+			return "male";
+		return "female";
 	}
 
 
@@ -196,8 +226,15 @@ public class Pet {
 	}
 	
 	public static void removePet(String petName, String ownerID) {
-		dbLink.removePet(petName, ownerID);
-		System.out.println("Pet removed : " + petName +", " + ownerID);
+		System.out.println("Removing pet for : " + ownerID + " , " + petName);
+		String petPhotoPath = dbLink.getPetPhotoPath(petName, ownerID);
+		
+		File petPhoto = new File(petPhotoPath); 
+	    if (petPhoto.delete() && dbLink.removePet(petName, ownerID) == 1) { 
+	      System.out.println("Pet removed : " + petName +", " + ownerID);
+	    } else {
+	      System.out.println("Failed to delete the file.");
+	    } 
 			
 		
 	}

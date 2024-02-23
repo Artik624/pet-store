@@ -174,8 +174,8 @@ public  class DbManager implements AutoCloseable {
 	}
 	
 	protected int insertPet(Pet newPet) {
-		String insertPetSql = "INSERT INTO \"pets\" (id, owner_id, category, name, gender, weight, height, length, short_description, full_description, photo) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String insertPetSql = "INSERT INTO \"pets\" (id, owner_id, category, name, age, gender, weight, height, length, short_description, full_description, photo) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		
 		int rowsAffected = 0;
 		try (PreparedStatement statement = con.prepareStatement(insertPetSql))
@@ -184,13 +184,14 @@ public  class DbManager implements AutoCloseable {
 	          statement.setString(2, newPet.getOwnerId());
 	          statement.setInt(3, newPet.getCategoryId());
 	          statement.setString(4, newPet.getName());
-	          statement.setBoolean(5, newPet.getGender());
-	          statement.setInt(6, newPet.getWeight());
-	          statement.setInt(7, newPet.getHeight());
-	          statement.setInt(8, newPet.getLength());
-	          statement.setString(9, newPet.getShortDescritpion());
-	          statement.setString(10, newPet.getFullDescription());
-	          statement.setString(11, newPet.getPhoto());
+	          statement.setInt(5, newPet.getAge());
+	          statement.setBoolean(6, newPet.getGender());
+	          statement.setInt(7, newPet.getWeight());
+	          statement.setInt(8, newPet.getHeight());
+	          statement.setInt(9, newPet.getLength());
+	          statement.setString(10, newPet.getShortDescritpion());
+	          statement.setString(11, newPet.getFullDescription());
+	          statement.setString(12, newPet.getPhoto());
           
           rowsAffected = statement.executeUpdate();
         System.out.println("Affected rows : " + rowsAffected);
@@ -198,41 +199,65 @@ public  class DbManager implements AutoCloseable {
           
           
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println("Exception in insertPet() : " + e);
 			
 		}
 		return rowsAffected;
 	}
 	
-	protected List<String> getPetsByOwnerID(String owner_id){
-		List<String> pets = new ArrayList<String>();
-		String getPetSql = "SELECT name FROM \"pets\" WHERE owner_id=?";
+	protected List<Pet> getPetsByOwnerID(String owner_id){
+		List<Pet> pets = new ArrayList<Pet>();
+		String getPetSql = "SELECT * FROM pets WHERE owner_id=?";
 		try(PreparedStatement statement = con.prepareStatement(getPetSql)){
 			statement.setString(1, owner_id);
 			ResultSet resultSet = statement.executeQuery();
 			while(resultSet.next()) {
-	              pets.add(resultSet.getString(1));
-	              
+				System.out.println("in result set ");
+				Pet p = new Pet(resultSet.getString("id"), resultSet.getString("owner_id"), resultSet.getInt("category"), resultSet.getString("name"), 
+	            		  resultSet.getBoolean("gender"), resultSet.getInt("age"), resultSet.getInt("weight"), resultSet.getInt("height"), resultSet.getInt("length"),
+	            		  resultSet.getString("short_description"), resultSet.getString("full_description"), resultSet.getString("photo")) ;
+	              pets.add(p);
 	        }
 		}
 		catch (Exception e){
-			System.out.println("Exception in get category ID : " + e);
+			System.out.println("Exception in getPetsByOwnerID() : " + e);
 			return null;
 		}
 		return pets;
 	}
 	
-	protected void removePet(String petName, String ownerID) {
-		String removePetSql = "DELETE FROM \"pets\" WHERE owner_id=? AND name=?";
+	protected int removePet(String petName, String ownerID) {
+		String removePetSql = "DELETE FROM pets WHERE owner_id=? AND name=?";
 		int rowsAffected = 0;
 		try(PreparedStatement statement = con.prepareStatement(removePetSql)){
 			statement.setString(1, ownerID);
 			statement.setString(2, petName);
-			statement.executeQuery();
+			rowsAffected = statement.executeUpdate();
 			
 		}
 		catch (Exception e){
 			System.out.println("Exception in Remove Pet  : " + e);
+		}
+		return rowsAffected;
+	}
+	
+	protected String getPetPhotoPath(String petName, String ownerID) {
+		String getPetPhotoPathSql = "SELECT photo FROM pets WHERE owner_id=? AND name=?";
+		String photoPath ="";
+		try(PreparedStatement statement = con.prepareStatement(getPetPhotoPathSql)){
+			statement.setString(1, ownerID);
+			statement.setString(2, petName);
+			ResultSet resultSet = statement.executeQuery();
+			while (resultSet.next()) {
+				photoPath = resultSet.getString(1);
+				
+			}
+			return photoPath;
+			
+		}
+		catch (Exception e){
+			System.out.println("Exception in Remove Pet  : " + e);
+			return photoPath;
 			
 		}
 	}

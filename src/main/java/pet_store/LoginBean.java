@@ -23,6 +23,9 @@ public class LoginBean {
 	
 	private User user;
 	
+	public LoginBean() {
+		
+	}
 	
 	public boolean getIsLoginValid() {
 		return isLoginValid;
@@ -40,7 +43,7 @@ public class LoginBean {
 		this.loginMessage = loginMessage;
 	}
 
-	public LoginBean(){}
+	
 
 	public String getEmail() {
 		return email;
@@ -69,8 +72,10 @@ public class LoginBean {
 		
 		
 		else {
+			System.out.println("email ok");
 			isEmailValid = true;
-			message = new FacesMessage("OK");
+			message = new FacesMessage("");
+			this.email = email;
 		}
 		context.addMessage(comp.getClientId(context), message);
 		
@@ -86,7 +91,7 @@ public class LoginBean {
 		}
 		else {
 			isPasswordValid = true;
-			message = new FacesMessage("OK");
+			message = new FacesMessage("");
 		}
 		context.addMessage(comp.getClientId(context), message);
 	}
@@ -103,18 +108,20 @@ public class LoginBean {
 
 		if(User.checkUserEmailExists(email) && User.authenticatePassword(password, email)) {
 			setIsLoginValid(true);
-			//setLoginMessage("Success");
+			setLoginMessage("");
 			System.out.println("Login successful");
 			user = User.getUser(email);
 			System.out.println("Test get user : id : "+ user.getId());
 			FacesContext facesContext = FacesContext.getCurrentInstance();
 			ExternalContext externalContext = facesContext.getExternalContext();
-			HttpSession session = (HttpSession) externalContext.getSession(false);
+			HttpSession session = (HttpSession) externalContext.getSession(true);
 			session.setAttribute("user", user);
 			return "dashboard.xhtml?faces-redirect=true";
 			
 		}
 		else {
+			
+	        
 			setLoginMessage("Invalid Login details");
 			setIsLoginValid(false);
 			System.out.println("Login failed");
