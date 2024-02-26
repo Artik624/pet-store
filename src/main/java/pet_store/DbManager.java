@@ -189,7 +189,7 @@ public  class DbManager implements AutoCloseable {
 	          statement.setInt(7, newPet.getWeight());
 	          statement.setInt(8, newPet.getHeight());
 	          statement.setInt(9, newPet.getLength());
-	          statement.setString(10, newPet.getShortDescritpion());
+	          statement.setString(10, newPet.getShortDescription());
 	          statement.setString(11, newPet.getFullDescription());
 	          statement.setString(12, newPet.getPhoto());
           
@@ -226,6 +226,27 @@ public  class DbManager implements AutoCloseable {
 		return pets;
 	}
 	
+	protected List<Pet> getPets(){
+		List<Pet> pets = new ArrayList<Pet>();
+		String getPetsSql = "SELECT * FROM pets ";
+		try(PreparedStatement statement = con.prepareStatement(getPetsSql)){
+			
+			ResultSet resultSet = statement.executeQuery();
+			while(resultSet.next()) {
+				System.out.println("in result set ");
+				Pet p = new Pet(resultSet.getString("id"), resultSet.getString("owner_id"), resultSet.getInt("category"), resultSet.getString("name"), 
+	            		  resultSet.getBoolean("gender"), resultSet.getInt("age"), resultSet.getInt("weight"), resultSet.getInt("height"), resultSet.getInt("length"),
+	            		  resultSet.getString("short_description"), resultSet.getString("full_description"), resultSet.getString("photo")) ;
+	              pets.add(p);
+	        }
+		}
+		catch (Exception e){
+			System.out.println("Exception in getPetsByOwnerID() : " + e);
+			return null;
+		}
+		return pets;
+	}
+	
 	protected int removePet(String petName, String ownerID) {
 		String removePetSql = "DELETE FROM pets WHERE owner_id=? AND name=?";
 		int rowsAffected = 0;
@@ -240,6 +261,31 @@ public  class DbManager implements AutoCloseable {
 		}
 		return rowsAffected;
 	}
+	
+	protected List<Pet> getPetByID(String id) {
+		String getPetSql = "SELECT * FROM pets WHERE id=?";
+		List<Pet> pet = new ArrayList<Pet>();
+		try(PreparedStatement statement = con.prepareStatement(getPetSql)){
+			statement.setString(1, id);
+			
+			ResultSet resultSet = statement.executeQuery();
+			if(resultSet.next()) {
+				Pet p = new Pet(resultSet.getString("id"), resultSet.getString("owner_id"), resultSet.getInt("category"), resultSet.getString("name"), 
+	            		  resultSet.getBoolean("gender"), resultSet.getInt("age"), resultSet.getInt("weight"), resultSet.getInt("height"), resultSet.getInt("length"),
+	            		  resultSet.getString("short_description"), resultSet.getString("full_description"), resultSet.getString("photo")) ;
+	           System.out.println("Found pet with ID : " + id);
+	           pet.add(p);
+				return pet;
+			}
+			
+		}
+		catch (Exception e){
+			System.out.println("Exception in getPetByID  : " + e);
+		}
+		return null;
+	}
+	
+	
 	
 	protected String getPetPhotoPath(String petName, String ownerID) {
 		String getPetPhotoPathSql = "SELECT photo FROM pets WHERE owner_id=? AND name=?";
@@ -261,4 +307,7 @@ public  class DbManager implements AutoCloseable {
 			
 		}
 	}
+	
+	
+	
 }

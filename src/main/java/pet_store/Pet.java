@@ -15,14 +15,14 @@ public class Pet {
 	private int weight;
 	private int height;
 	private int length;
-	private String shortDescritpion;
+	private String shortDescription;
 	private String fullDescription;
 	private String photo;
 	
 	
 	
 	public Pet(String ownerId, String category, String name, String gender, int age, int weight, int height, int length,
-			String shortDescritpion, String fullDescription, String photo) {
+			String shortDescription, String fullDescription, String photo) {
 		this.id = User.generateUUID();
 		this.ownerId = ownerId;
 		
@@ -45,7 +45,7 @@ public class Pet {
 		this.weight = weight;
 		this.height = height;
 		this.length = length;
-		this.shortDescritpion = shortDescritpion;
+		this.shortDescription = shortDescription;
 		this.fullDescription = fullDescription;
 		this.photo = photo;
 	}
@@ -53,7 +53,7 @@ public class Pet {
 	
 
 	public Pet(String id, String ownerId, int categoryId, String name, boolean gender, int age, int weight, int height,
-			int length, String shortDescritpion, String fullDescription, String photo) {
+			int length, String shortDescription, String fullDescription, String photo) {
 		System.out.println("created pet ");
 		this.id = id;
 		this.ownerId = ownerId;
@@ -64,7 +64,7 @@ public class Pet {
 		this.weight = weight;
 		this.height = height;
 		this.length = length;
-		this.shortDescritpion = shortDescritpion;
+		this.shortDescription = shortDescription;
 		this.fullDescription = fullDescription;
 		this.photo = photo;
 	}
@@ -178,14 +178,14 @@ public class Pet {
 
 
 
-	public String getShortDescritpion() {
-		return shortDescritpion;
+	public String getShortDescription() {
+		return shortDescription;
 	}
 
 
 
-	public void setShortDescritpion(String shortDescritpion) {
-		this.shortDescritpion = shortDescritpion;
+	public void setShortDescription(String shortDescription) {
+		this.shortDescription = shortDescription;
 	}
 
 
@@ -236,6 +236,8 @@ public class Pet {
 	      System.out.println("Failed to delete the file.");
 	    } 
 			
+	    
+	 
 		
 	}
 	

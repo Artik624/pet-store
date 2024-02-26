@@ -26,6 +26,12 @@
                			</f:facet>
 		            	<h:outputText value="Age: #{pet.age}" />
 		            	<h:outputText value="Gender: #{pet.genderString}" />
+		            	<h:outputText value="Weight: #{pet.weight}" />
+		            	<h:outputText value="Height: #{pet.height}" />
+		            	<h:outputText value="Length: #{pet.length}" />
+		            	<h:outputText value="Short Description: #{pet.shortDescription}" />
+		            	<h:outputText value="Full Description: #{pet.fullDescription}" />
+		            	
 		            	  <f:facet name = "footer">
 		            	  	<h:commandButton value="Remove pet" action="#{dashboardBean.removePet}">
 		            			<f:param name="petName" value="#{pet.name}" />

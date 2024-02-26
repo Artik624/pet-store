@@ -1,21 +1,73 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
       
       <h:head>
       
       
       </h:head>
       <h:body>
-      <h:dataTable>
-      	<h:column></h:column>
-      	<h:column></h:column>
-      	<h:column></h:column>
-      
-      
-      </h:dataTable>
-      
+      <h:form>
+	      	<h:panelGrid columns="2" border="1" cellpadding = "10" cellspacing = "1">
+	      		<f:facet name = "header">
+               		<h:outputText value = "Available Pets"/>
+               </f:facet>
+               
+	            <ui:repeat value="#{petsBean.allPets}" var="pet" >
+	                <h:panelGrid columns="1" cellpadding = "5"  style="border:1px solid black; margin-bottom:10px;">
+	                	<f:facet name = "header">
+               				<h:outputText value = "Name: #{pet.name}"/>
+               			</f:facet>
+		            	<h:outputText value="Age: #{pet.age}" />
+		            	<h:outputText value="Short Description: #{pet.shortDescription}" />
+		            	
+		            	
+		            	  <f:facet name = "footer">
+		            	  	<h:commandButton value="View Pet" action="#{petsBean.viewPet}">
+		            			<f:param name="id" value="#{pet.id}" />
+		            		</h:commandButton>
+		            	  
+		            	  </f:facet>
+		        	</h:panelGrid>
+	                
+	            </ui:repeat>
+	            
+	            <h:panelGroup rendered="#{petsBean.showPet}">
+	            	<h:panelGrid columns="2" border="1" cellpadding = "10" cellspacing = "1">
+	      		
+               
+	            <ui:repeat value="#{petsBean.viewPet}" var="pet" >
+	                <h:panelGrid columns="1" cellpadding = "5"  style="border:1px solid black; margin-bottom:10px;">
+	                	<f:facet name = "header">
+               				<h:outputText value = "Name: #{pet.name}"/>
+               			</f:facet>
+		            	<h:outputText value="Age: #{pet.age}" />
+		            	<h:outputText value="Gender: #{pet.genderString}" />
+		            	<h:outputText value="Weight: #{pet.weight}" />
+		            	<h:outputText value="Height: #{pet.height}" />
+		            	<h:outputText value="Length: #{pet.length}" />
+		            	<h:outputText value="Short Description: #{pet.shortDescription}" />
+		            	<h:outputText value="Full Description: #{pet.fullDescription}" />
+		            	
+		            	  <f:facet name = "footer">
+		            	  	<h:commandButton value="Request Adoption" action="#{petsBean.requestAdoption}">
+		            			<f:param name="petName" value="#{pet.name}" />
+		            		</h:commandButton>
+		            	  
+		            	  </f:facet>
+		        	</h:panelGrid>
+	                
+	            </ui:repeat>
+       			 
+	      	</h:panelGrid>
+	            
+	            </h:panelGroup>
+       			 
+	      	</h:panelGrid>
+	      
+	      </h:form>
       </h:body>
       
       
