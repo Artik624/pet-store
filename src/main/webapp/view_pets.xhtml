@@ -9,11 +9,77 @@
       
       </h:head>
       <h:body>
-      <h:form>
+	      
+	      	<table style="border: 1px solid black">
+	
+			<tr style="">
+				<td style="padding: 10px; ">
+					<h:form enctype="multipart/form-data" >
+						<ui:repeat value="#{petsBean.allPets}" var="pet" >
+							<div style="border: 1px solid black">
+		               			<h:outputText value = "Name: #{pet.name}"/><br/>
+				            	<h:outputText value="Age: #{pet.age}" /><br/>
+				            	<h:outputText value="Short Description: #{pet.shortDescription}" /><br/>
+				            	<b>Photo:</b>#{pet.photo}<br />
+								<h:graphicImage library="images" name="#{pet.photo}" style="width: 100px; height:100px;"/><br/>
+			            	  	<h:commandButton value="View Pet" action="#{petsBean.viewPet}">
+			            			<f:param name="id" value="#{pet.id}" />
+			            		</h:commandButton>
+								<br/>
+							
+							
+							</div>
+						
+	           		 	</ui:repeat>
+					</h:form>
+					</td>
+					<td>
+						 <h:panelGroup rendered="#{petsBean.showPet}">
+							<h:form enctype="multipart/form-data"
+									style="display: flex; flex-wrap: wrap;">
+									<ui:repeat value="#{petsBean.viewPet}" var="pet">
+										<div style="flex: 0 0 60%; padding: 10px; border: 1px solid black">
+											<b>Name:</b> #{pet.name}<br /> 
+											<b>Age:</b> #{pet.age}<br /> 
+											<b>Gender:</b>#{pet.genderString}<br /> 
+											<b>Weight:</b> #{pet.weight}<br /> 
+											<b>Height:</b>#{pet.height}<br /> 
+											<b>Length:</b> #{pet.length}<br /> 
+											<b>Short Description:</b> #{pet.shortDescription}<br /> 
+											<b>Full Description:</b> #{pet.fullDescription}<br /> 
+											<b>Photo:</b>#{pet.photo}<br />
+											
+											<h:graphicImage library="images" name="#{pet.photo}" style="width: 300px; height:300px;"/>
+											
+											<br />
+											
+						            	  	<h:commandButton value="Request Adoption" >
+						            			<f:param name="petName" value="#{pet.name}" />
+						            		</h:commandButton>
+						            		<br/>
+						            	  	<h:commandButton value="Close" action="#{petsBean.viewPet}"/>
+						            		
+						            	  
+						            	  
+										</div>
+									</ui:repeat>
+								</h:form>
+						 
+						 
+						 </h:panelGroup>
+					</td>
+	
+			</tr>
+		</table>
+	      
+	      
+     <!--  <h:form>
+      
 	      	<h:panelGrid columns="2" border="1" cellpadding = "10" cellspacing = "1">
 	      		<f:facet name = "header">
                		<h:outputText value = "Available Pets"/>
                </f:facet>
+               
                
 	            <ui:repeat value="#{petsBean.allPets}" var="pet" >
 	                <h:panelGrid columns="1" cellpadding = "5"  style="border:1px solid black; margin-bottom:10px;">
@@ -50,11 +116,15 @@
 		            	<h:outputText value="Length: #{pet.length}" />
 		            	<h:outputText value="Short Description: #{pet.shortDescription}" />
 		            	<h:outputText value="Full Description: #{pet.fullDescription}" />
-		            	
+		            	<h:outputText value="photo path:  #{pet.photo}" />
+		            	<h:graphicImage value="#{pet.photo}" alt="Pet photo" />
 		            	  <f:facet name = "footer">
-		            	  	<h:commandButton value="Request Adoption" action="#{petsBean.requestAdoption}">
+		            	  	<h:commandButton value="Request Adoption" >
 		            			<f:param name="petName" value="#{pet.name}" />
 		            		</h:commandButton>
+		            		<br/>
+		            	  	<h:commandButton value="Close" action="#{petsBean.viewPet}"/>
+		            		
 		            	  
 		            	  </f:facet>
 		        	</h:panelGrid>
@@ -67,7 +137,7 @@
        			 
 	      	</h:panelGrid>
 	      
-	      </h:form>
+	      </h:form> -->
       </h:body>
       
       

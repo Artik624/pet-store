@@ -29,11 +29,17 @@ public class PetsBean {
 	
 	
 	public void viewPet() {
-		showPet = true;
-		Map<String,String> params = externalContext.getRequestParameterMap();
-		String id = params.get("id");
-		System.out.println("Getting pet by ID: " + id);
-		viewPet=  dbLink.getPetByID(id);
+		System.out.println("view pet");
+		if(!showPet) {
+			showPet = true;
+			Map<String,String> params = externalContext.getRequestParameterMap();
+			String id = params.get("id");
+			System.out.println("Getting pet by ID: " + id);
+			viewPet=  dbLink.getPetByID(id);
+		}
+		else {
+			showPet = false;
+		}
 		
 	}
 	

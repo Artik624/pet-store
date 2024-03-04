@@ -3,11 +3,19 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public  class DbManager implements AutoCloseable {
 	
 	private static DbManager dbManagerInstance;
 	private static Connection con;
+	protected static final Path SRC_FULL_PATH = Paths.get("C:", "Users", "artiu", "eclipse-workspace", "pet_store", "src", "main");
+	protected static final Path IMGS_FULL_PATH = Paths.get("C:", "Users", "artiu", "eclipse-workspace", "pet_store", "src", "main", "webapp","resources", "images");
+	protected static final Path IMGS_RLTV_PATH = Paths.get(".").resolve("resources").resolve("images");
+	
 	
 	private DbManager()  {
 		try {
@@ -306,6 +314,27 @@ public  class DbManager implements AutoCloseable {
 			return photoPath;
 			
 		}
+	}
+	
+	protected static String convertPath(String path, String name, String id) {
+		String normalaizedFullPath = IMGS_FULL_PATH.toString();
+		String normalaizedRlativePath = IMGS_RLTV_PATH.toString();
+		
+		
+		System.out.println("in Convert path : " + path + "\n" + normalaizedFullPath  +"\n" + normalaizedRlativePath);
+		String temp ="";
+		if(path.startsWith(normalaizedFullPath)) {
+			System.out.println("full path detected");
+			temp = path.substring(normalaizedFullPath.length());
+			
+			return IMGS_RLTV_PATH.resolve(id).resolve(name +".jpg").toString();
+		}
+		if(path.startsWith(normalaizedRlativePath)) {
+			System.out.println("relative path detected");
+			temp = path.substring(normalaizedRlativePath.length());
+			return IMGS_FULL_PATH.resolve(id).resolve(name +".jpg").toString();
+		}
+		return "";
 	}
 	
 	

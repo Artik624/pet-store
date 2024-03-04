@@ -5,124 +5,135 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
       
       <h:head>
-      <title>Dashboard</title>
-      
+      	<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      	<title>Dashboard </title>
+      	
       </h:head>
       <h:body>
-	      <h:form>
-	      	<h:outputText value="Welcome, #{dashboardBean.firstName}"></h:outputText>
-	      </h:form>
-	      
-	       <h:form>
-	      	<h:panelGrid columns="2" border="1" cellpadding = "10" cellspacing = "1">
-	      		<f:facet name = "header">
-               		<h:outputText value = "Your Pets"/>
-               </f:facet>
-               
-	            <ui:repeat value="#{dashboardBean.petsList}" var="pet" >
-	                <h:panelGrid columns="1" cellpadding = "5"  style="border:1px solid black; margin-bottom:10px;">
-	                	<f:facet name = "header">
-               				<h:outputText value = "Name: #{pet.name}"/>
-               			</f:facet>
-		            	<h:outputText value="Age: #{pet.age}" />
-		            	<h:outputText value="Gender: #{pet.genderString}" />
-		            	<h:outputText value="Weight: #{pet.weight}" />
-		            	<h:outputText value="Height: #{pet.height}" />
-		            	<h:outputText value="Length: #{pet.length}" />
-		            	<h:outputText value="Short Description: #{pet.shortDescription}" />
-		            	<h:outputText value="Full Description: #{pet.fullDescription}" />
-		            	
-		            	  <f:facet name = "footer">
-		            	  	<h:commandButton value="Remove pet" action="#{dashboardBean.removePet}">
-		            			<f:param name="petName" value="#{pet.name}" />
-		            		</h:commandButton>
-		            	  
-		            	  </f:facet>
-		        	</h:panelGrid>
-	                
-	            </ui:repeat>
-       			 
-	      	</h:panelGrid>
-	      
-	      </h:form>
-	      
-	      
-	      <h:form id="addPetForm" enctype="multipart/form-data">
-	      	<br/>
-			<h:commandButton id="addPet" value="Add pet" action="#{dashboardBean.addPet}"> </h:commandButton>      
-	      	<br/>
-	      	
-	        <h:panelGroup rendered="#{dashboardBean.showAddPet}">
-	        
-		        <h:outputLabel for="petName">Enter pet name: </h:outputLabel>
-		        <h:inputText id="petName" required="true" validator="#{dashboardBean.petNameValidator}" resetInput="true"></h:inputText>
-		        <h:message for="petName"/>
-		        <br/>
-		        
-		        <h:outputLabel for="petGender">Choose pet gender: </h:outputLabel>
-		        <h:selectOneMenu  value="#{dashboardBean.petGender}" resetInput="true">
-		        	<f:selectItems value="#{dashboardBean.gendersOptions}" />
-		        </h:selectOneMenu>
-		        <br/>
-		        
-		       <h:outputLabel for="petCategory">Choose pet category: </h:outputLabel>
-	            <h:selectOneMenu id="petCategory" value="#{dashboardBean.petCategory}" resetInput="true">
-	                <f:selectItems value="#{dashboardBean.categoriesOptions}" />
-	            </h:selectOneMenu>
-	            <br/>
-	            
-		        <h:outputLabel for="petAge">Enter pet age: </h:outputLabel>
-	           	<h:selectOneMenu id="petAge" value="#{dashboardBean.petAge}" resetInput="true">
-	                <f:selectItems value="#{dashboardBean.sizeOptions}" />
-	            </h:selectOneMenu>
-	            <br/>
-	           	
-		        <h:outputLabel for="petHeight">Enter pet height: </h:outputLabel>
-	           	<h:selectOneMenu id="petHeight" value="#{dashboardBean.petHeight}" resetInput="true">
-	                <f:selectItems value="#{dashboardBean.sizeOptions}" />
-	            </h:selectOneMenu>
-	            <br/>
-		        
-		        <h:outputLabel for="petWeight">Enter pet weight: </h:outputLabel>
-	           	<h:selectOneMenu id="petWeight" value="#{dashboardBean.petWeight}" resetInput="true">
-	                <f:selectItems value="#{dashboardBean.sizeOptions}" />
-	            </h:selectOneMenu>
-	            <br/>
-		        
-		        <h:outputLabel for="petLength">Enter pet length: </h:outputLabel>
-	           	<h:selectOneMenu id="petLength" value="#{dashboardBean.petLength}" resetInput="true">
-	                <f:selectItems value="#{dashboardBean.sizeOptions}" />
-	            </h:selectOneMenu>
-	            <br/>
-		        
-		        <h:outputLabel for="petShortDesc">Enter short description of the pet: </h:outputLabel>
-	           	<h:inputTextarea id="petShortDesc" value="#{dashboardBean.shortDescription}" required="true" resetInput="true"></h:inputTextarea>
-	           	
-		        <br/>
-		        
-		        <h:outputLabel for="petFullDesc">Enter full description of the pet: </h:outputLabel>
-	           	<h:inputTextarea id="petFullDesc" value="#{dashboardBean.fullDescription}" required="true" resetInput="true"></h:inputTextarea>
-	           	
-		        <br/>
-		        
-		        <h:outputLabel for="petPhoto">Choose photo of the pet: </h:outputLabel>
-	           	<h:inputFile id="petPhoto" value="#{dashboardBean.petPhoto}" required="true" ></h:inputFile>
-	           	
-		        <br/>
-		        
-		        
-		        
-		        
-		        <h:commandButton id="submitPet" value="Submit" 
-		        action="#{dashboardBean.addNewPet}" >  
-		        	<f:resetValues render="addPetForm:petName"/>
-		        
-		        </h:commandButton>
-		        
-	        </h:panelGroup>
-	       </h:form>
-	      
-      </h:body>
+      	<h:outputText value="Welcome, #{dashboardBean.firstName}"> </h:outputText>
+		<table style="border: 1px solid black">
+	
+			<tr style="">
+				<td style="padding: 10px; vertical-align: top; width: 5%">
+					<h:form id="addPetForm" enctype="multipart/form-data">
+							<br />
+							<h:commandButton id="addPet" value="Add pet"
+								action="#{dashboardBean.addPet}">
+							</h:commandButton>
+							<br />
+		
+							<h:panelGroup rendered="#{dashboardBean.showAddPet}">
+		
+								<h:outputLabel for="petName">Enter pet name: </h:outputLabel>
+								<h:inputText id="petName" required="true"
+									requiredMessage="Required"
+									validator="#{dashboardBean.petNameValidator}" resetInput="true"></h:inputText>
+								<h:message for="petName" />
+								<br />
+		
+								<h:outputLabel for="petGender">Choose pet gender: </h:outputLabel>
+								<h:selectOneMenu value="#{dashboardBean.petGender}"
+									resetInput="true">
+									<f:selectItems value="#{dashboardBean.gendersOptions}" />
+								</h:selectOneMenu>
+								<br />
+		
+								<h:outputLabel for="petCategory">Choose pet category: </h:outputLabel>
+								<h:selectOneMenu id="petCategory"
+									value="#{dashboardBean.petCategory}" resetInput="true">
+									<f:selectItems value="#{dashboardBean.categoriesOptions}" />
+								</h:selectOneMenu>
+								<br />
+		
+								<h:outputLabel for="petAge">Enter pet age: </h:outputLabel>
+								<h:selectOneMenu id="petAge" value="#{dashboardBean.petAge}"
+									resetInput="true">
+									<f:selectItems value="#{dashboardBean.sizeOptions}" />
+								</h:selectOneMenu>
+								<br />
+		
+								<h:outputLabel for="petHeight">Enter pet height: </h:outputLabel>
+								<h:selectOneMenu id="petHeight" value="#{dashboardBean.petHeight}"
+									resetInput="true">
+									<f:selectItems value="#{dashboardBean.sizeOptions}" />
+								</h:selectOneMenu>
+								<br />
+		
+								<h:outputLabel for="petWeight">Enter pet weight: </h:outputLabel>
+								<h:selectOneMenu id="petWeight" value="#{dashboardBean.petWeight}"
+									resetInput="true">
+									<f:selectItems value="#{dashboardBean.sizeOptions}" />
+								</h:selectOneMenu>
+								<br />
+		
+								<h:outputLabel for="petLength">Enter pet length: </h:outputLabel>
+								<h:selectOneMenu id="petLength" value="#{dashboardBean.petLength}"
+									resetInput="true">
+									<f:selectItems value="#{dashboardBean.sizeOptions}" />
+								</h:selectOneMenu>
+								<br />
+		
+								<h:outputLabel for="petShortDesc">Enter short description of the pet: </h:outputLabel>
+								<h:inputTextarea id="petShortDesc"
+									value="#{dashboardBean.shortDescription}" required="true"
+									requiredMessage="Required" resetInput="true"></h:inputTextarea>
+		
+								<br />
+		
+								<h:outputLabel for="petFullDesc">Enter full description of the pet: </h:outputLabel>
+								<h:inputTextarea id="petFullDesc"
+									value="#{dashboardBean.fullDescription}" required="true"
+									requiredMessage="Required" resetInput="true"></h:inputTextarea>
+		
+								<br />
+		
+								<h:outputLabel for="petPhoto">Choose photo of the pet: </h:outputLabel>
+								<h:inputFile id="petPhoto" value="#{dashboardBean.petPhoto}"
+									required="true"></h:inputFile>
+		
+								<br />
+								
+								
+								<br/>
+								<h:commandButton id="submitPet" value="Submit"
+									action="#{dashboardBean.addNewPet}">
+									<f:resetValues render="addPetForm:petName" />
+								</h:commandButton>
+							</h:panelGroup>
+						</h:form>
+					</td>
+					<td>
+						<h:form enctype="multipart/form-data"
+								style="display: flex; flex-wrap: wrap;">
+								<ui:repeat value="#{dashboardBean.petsList}" var="pet">
+									<div style="flex: 0 0 33.33%; padding: 10px; border: 1px solid black">
+										<b>Name:</b> #{pet.name}<br /> 
+										<b>Age:</b> #{pet.age}<br /> 
+										<b>Gender:</b>#{pet.genderString}<br /> 
+										<b>Weight:</b> #{pet.weight}<br /> 
+										<b>Height:</b>#{pet.height}<br /> 
+										<b>Length:</b> #{pet.length}<br /> 
+										<b>Short Description:</b> #{pet.shortDescription}<br /> 
+										<b>Full Description:</b> #{pet.fullDescription}<br /> 
+										<b>Photo:</b>#{pet.photo}<br />
+										
+										<h:graphicImage library="images" name="#{pet.photo}" style="width: 100px; height:100px;"/>
+										
+										<br />
+										<h:commandButton value="Remove pet"
+											action="#{dashboardBean.removePet}">
+											<f:param name="petName" value="#{pet.name}" />
+										</h:commandButton>
+									</div>
+								</ui:repeat>
+							</h:form>
+					</td>
+	
+			</tr>
+		</table>
+
+	</h:body>
       
       
 </html>

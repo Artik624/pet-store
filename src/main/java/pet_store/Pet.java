@@ -227,8 +227,11 @@ public class Pet {
 	
 	public static void removePet(String petName, String ownerID) {
 		System.out.println("Removing pet for : " + ownerID + " , " + petName);
-		String petPhotoPath = dbLink.getPetPhotoPath(petName, ownerID);
+		//String petPhotoPath = DbManager.convertPath(dbLink.getPetPhotoPath(petName, ownerID));
+		//String petPhotoPath = DbManager.convertPath(dbLink.getPetPhotoPath(petName, ownerID),  petName,  ownerID);
+		String petPhotoPath = DbManager.IMGS_FULL_PATH.resolve(dbLink.getPetPhotoPath(petName, ownerID)).toString();
 		
+		System.out.println("photo path in remove pet : " + petPhotoPath);
 		File petPhoto = new File(petPhotoPath); 
 	    if (petPhoto.delete() && dbLink.removePet(petName, ownerID) == 1) { 
 	      System.out.println("Pet removed : " + petName +", " + ownerID);

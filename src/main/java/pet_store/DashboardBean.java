@@ -218,6 +218,12 @@ public class DashboardBean {
 		
 		setShortDescription("");
 		setFullDescription("");
+		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        try {
+            externalContext.redirect(externalContext.getRequestContextPath() + "/dashboard.xhtml");
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle the exception
+        }
 	}
 	
 	
@@ -280,21 +286,22 @@ public class DashboardBean {
 	
 	public String uploadPhoto() {
 		String userId = user.getId();
-		String userResourcePath = "C:\\Users\\artiu\\eclipse-workspace\\pet_store\\src\\main\\resources\\" + userId+"\\" ;
-		String petPhotoPath = userResourcePath + petName+".jpg";
+		String userResourcePath = DbManager.IMGS_FULL_PATH.resolve(userId).toString();
+		String petPhotoRelativePath = userId + "\\" + (petName+".jpg");
+		String petPhotoFullPath = DbManager.IMGS_FULL_PATH.resolve(userId).resolve(petName+".jpg").toString();
 		File dir = new File(userResourcePath);
 		if(!dir.exists()) {
 			dir.mkdirs();
 		}
-		System.out.println("file name : " + petPhoto.getName());
+		System.out.println("uploading file : " + petPhotoFullPath);
         try (InputStream input = petPhoto.getInputStream();
-             OutputStream output = new FileOutputStream(petPhotoPath)) {
+             OutputStream output = new FileOutputStream(petPhotoFullPath)) {
             byte[] buffer = new byte[1024];
             int bytesRead;
             while ((bytesRead = input.read(buffer)) != -1) {
                 output.write(buffer, 0, bytesRead);
             }
-            return petPhotoPath;
+            return petPhotoRelativePath;
         } catch (IOException e) {
             e.printStackTrace();
             return "";
