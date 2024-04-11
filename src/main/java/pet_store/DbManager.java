@@ -181,6 +181,29 @@ public  class DbManager implements AutoCloseable {
 		
 	}
 	
+	protected String getPetCategoryById(int id) {
+		String getCategorySql = "SELECT \"category\" FROM \"categories\" WHERE category_id=?" ;
+		try(PreparedStatement statement = con.prepareStatement(getCategorySql)){
+			statement.setInt(1, id);
+			ResultSet resultSet = statement.executeQuery();
+			if (resultSet.next()) {
+	              String category = resultSet.getString(1);
+	              return category;
+	        }
+			else {
+				System.out.println("ERROR category Id not found");
+				return "";
+			}
+		}
+		catch (Exception e){
+			System.out.println("Exception in get category : " + e);
+			return "";
+		}
+		
+		
+		
+	}
+	
 	protected int insertPet(Pet newPet) {
 		String insertPetSql = "INSERT INTO \"pets\" (id, owner_id, category, name, age, gender, weight, height, length, short_description, full_description, photo) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -220,7 +243,7 @@ public  class DbManager implements AutoCloseable {
 			statement.setString(1, owner_id);
 			ResultSet resultSet = statement.executeQuery();
 			while(resultSet.next()) {
-				System.out.println("in result set ");
+				
 				Pet p = new Pet(resultSet.getString("id"), resultSet.getString("owner_id"), resultSet.getInt("category"), resultSet.getString("name"), 
 	            		  resultSet.getBoolean("gender"), resultSet.getInt("age"), resultSet.getInt("weight"), resultSet.getInt("height"), resultSet.getInt("length"),
 	            		  resultSet.getString("short_description"), resultSet.getString("full_description"), resultSet.getString("photo")) ;
@@ -241,7 +264,7 @@ public  class DbManager implements AutoCloseable {
 			
 			ResultSet resultSet = statement.executeQuery();
 			while(resultSet.next()) {
-				System.out.println("in result set ");
+				
 				Pet p = new Pet(resultSet.getString("id"), resultSet.getString("owner_id"), resultSet.getInt("category"), resultSet.getString("name"), 
 	            		  resultSet.getBoolean("gender"), resultSet.getInt("age"), resultSet.getInt("weight"), resultSet.getInt("height"), resultSet.getInt("length"),
 	            		  resultSet.getString("short_description"), resultSet.getString("full_description"), resultSet.getString("photo")) ;
@@ -316,25 +339,53 @@ public  class DbManager implements AutoCloseable {
 		}
 	}
 	
-	protected static String convertPath(String path, String name, String id) {
-		String normalaizedFullPath = IMGS_FULL_PATH.toString();
-		String normalaizedRlativePath = IMGS_RLTV_PATH.toString();
-		
-		
-		System.out.println("in Convert path : " + path + "\n" + normalaizedFullPath  +"\n" + normalaizedRlativePath);
-		String temp ="";
-		if(path.startsWith(normalaizedFullPath)) {
-			System.out.println("full path detected");
-			temp = path.substring(normalaizedFullPath.length());
+//	protected static String convertPath(String path, String name, String id) {
+//		String normalaizedFullPath = IMGS_FULL_PATH.toString();
+//		String normalaizedRlativePath = IMGS_RLTV_PATH.toString();
+//		
+//		
+//		System.out.println("in Convert path : " + path + "\n" + normalaizedFullPath  +"\n" + normalaizedRlativePath);
+//		String temp ="";
+//		if(path.startsWith(normalaizedFullPath)) {
+//			System.out.println("full path detected");
+//			temp = path.substring(normalaizedFullPath.length());
+//			
+//			return IMGS_RLTV_PATH.resolve(id).resolve(name +".jpg").toString();
+//		}
+//		if(path.startsWith(normalaizedRlativePath)) {
+//			System.out.println("relative path detected");
+//			temp = path.substring(normalaizedRlativePath.length());
+//			return IMGS_FULL_PATH.resolve(id).resolve(name +".jpg").toString();
+//		}
+//		return "";
+//	}
+	
+	protected User getOwnerByPetID(String petId) {
+		String getOwner = "select * \r\n"
+				+ "from users \r\n"
+				+ "where id=(select owner_id from pets where id=?)";
+		try(PreparedStatement statement = con.prepareStatement(getOwner)){
+			statement.setString(1, petId);
+			ResultSet resultSet = statement.executeQuery();
+			if (resultSet.next()) {
+	              //String hashedPass = resultSet.getString(1);
+				String firstName = resultSet.getString(1);
+				String lastName = resultSet.getString(2);
+				String email = resultSet.getString(3);
+				int phone = resultSet.getInt(4);
+				String city = resultSet.getString(5);
+				String street = resultSet.getString(6);
+				int streetNumber = resultSet.getInt(7);
+				String uuid = resultSet.getString(8);
+				
+				return new User(uuid, firstName, lastName, email,  phone, city, street, streetNumber);
+	              
+			}
+		}
+		catch (Exception e){
 			
-			return IMGS_RLTV_PATH.resolve(id).resolve(name +".jpg").toString();
 		}
-		if(path.startsWith(normalaizedRlativePath)) {
-			System.out.println("relative path detected");
-			temp = path.substring(normalaizedRlativePath.length());
-			return IMGS_FULL_PATH.resolve(id).resolve(name +".jpg").toString();
-		}
-		return "";
+		return null;
 	}
 	
 	

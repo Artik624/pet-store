@@ -54,7 +54,7 @@ public class Pet {
 
 	public Pet(String id, String ownerId, int categoryId, String name, boolean gender, int age, int weight, int height,
 			int length, String shortDescription, String fullDescription, String photo) {
-		System.out.println("created pet ");
+		
 		this.id = id;
 		this.ownerId = ownerId;
 		this.categoryId = categoryId;
@@ -200,6 +200,9 @@ public class Pet {
 		this.fullDescription = fullDescription;
 	}
 
+	public String getCategory() {
+		return dbLink.getPetCategoryById(this.getCategoryId());
+	}
 
 
 	
@@ -211,6 +214,7 @@ public class Pet {
 	public void setPhoto(String photo) {
 		this.photo = photo;
 	}
+	
 
 	private int getCategoryId(String category) throws Exception {
 		int categoryId = dbLink.getPetCategoryId(category);

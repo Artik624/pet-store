@@ -2,6 +2,7 @@ package pet_store;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.RequestScoped;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
@@ -12,7 +13,7 @@ import javax.servlet.http.HttpSession;
 
 @SuppressWarnings("deprecation")
 @ManagedBean
-@SessionScoped
+@RequestScoped 
 public class LoginBean {
 	private String email;
 	private String password;
