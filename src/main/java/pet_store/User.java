@@ -188,5 +188,13 @@ public class User {
 		return dbLink.getPetsByOwnerID(this.getId());
 	}
 	
+	public List<AdoptionRequestWrapper> getAdoptionRequests(){
+		return dbLink.getAdoptionRequestsForUser(id);
+	}
+	
+	public List<AdoptionRequestWrapper> getMyAdoptionRequests(){
+		return dbLink.getAdoptionRequestsByUser(id);
+	}
+	
 	
 }

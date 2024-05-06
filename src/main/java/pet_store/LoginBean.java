@@ -5,15 +5,17 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
-import javax.faces.context.ExternalContext;
+//import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.faces.context.Flash;
-import javax.servlet.http.HttpSession;
+//import javax.faces.context.Flash;
+//import javax.servlet.http.HttpSession;
+
 
 
 @SuppressWarnings("deprecation")
 @ManagedBean
 @RequestScoped 
+//TODO: FIX LOGIN user session , one user logs in then another can't log in ..maybe add a log out ? 
 public class LoginBean {
 	private String email;
 	private String password;
@@ -21,6 +23,7 @@ public class LoginBean {
 	private boolean isPasswordValid = false;
 	private String loginMessage;
 	private boolean isLoginValid = false;
+	
 	
 	private User user;
 	
@@ -113,10 +116,7 @@ public class LoginBean {
 			System.out.println("Login successful");
 			user = User.getUser(email);
 			System.out.println("Test get user : id : "+ user.getId());
-			FacesContext facesContext = FacesContext.getCurrentInstance();
-			ExternalContext externalContext = facesContext.getExternalContext();
-			HttpSession session = (HttpSession) externalContext.getSession(true);
-			session.setAttribute("user", user);
+			SessionManager.setAttribute("user", user);//TODO: FIX login set attribute 
 			return "dashboard.xhtml?faces-redirect=true";
 			
 		}
@@ -128,6 +128,23 @@ public class LoginBean {
 			System.out.println("Login failed");
 			user = null;
 			return "";
+		}
+		
+	}
+	
+	public void invalidateSession() {
+		System.out.println("invalidating session");
+		SessionManager.invalidateSession();
+	}
+	
+	public boolean getCheckSession() {
+		try {
+			boolean testSess = (boolean)SessionManager.getAttribute("isUserLoggedIn");
+			System.out.println("testing session : " + testSess);
+			return true;
+		} catch (Exception e) {
+			System.out.println("Exception -> " + e);
+			return false;
 		}
 		
 	}

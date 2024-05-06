@@ -21,10 +21,10 @@ import javax.servlet.http.Part;
 public class DashboardBean {
 
 	
-	private FacesContext facesContext = FacesContext.getCurrentInstance();
-	private ExternalContext externalContext = facesContext.getExternalContext();
-	private HttpSession session = (HttpSession) externalContext.getSession(false);
-	private User user = (User)session.getAttribute("user");
+private FacesContext facesContext = FacesContext.getCurrentInstance();
+private ExternalContext externalContext = facesContext.getExternalContext();
+//	private HttpSession session = (HttpSession) externalContext.getSession(true);
+	private User user;
 	
 	
 	private String petName;
@@ -37,7 +37,7 @@ public class DashboardBean {
 	private String shortDescription;
 	private String fullDescription;
 	private Part petPhoto;
-	private List<Pet> petsList = (user != null ? user.getPetsList() : null);
+	private List<Pet> petsList;
 	
 	private int MIN_NAME_LENGTH = 2;
 	private int MAX_NAME_LENGTH = 10;
@@ -49,21 +49,50 @@ public class DashboardBean {
 	
 	
 	
+	private List<AdoptionRequestWrapper> adoptionRequests;
 	private List<String> petCategories;
 	private List<String> gendersList;
 	private List<Integer> sizeList;
-	private boolean showAddPet = false;
+	private boolean showAddPet;
+	private boolean showViewRequests;
+	private boolean showViewSentRequests;
 	
 	
-	public DashboardBean() {
+	
+	public boolean isShowViewSentRequests() {
+		return showViewSentRequests;
+	}
+
+	public void setShowViewSentRequests(boolean showViewSentRequests) {
+		this.showViewSentRequests = showViewSentRequests;
+	}
+
+	public boolean isShowViewRequests() {
+		return showViewRequests;
+	}
+
+	public void setShowViewRequests(boolean showViewRequests) {
+		this.showViewRequests = showViewRequests;
+	}
+
+	public void initDashboard() {
 		petCategories = new ArrayList<>();
 		gendersList = new ArrayList<>();
 		gendersList.add("male");
 		gendersList.add("female");
 		sizeList = new ArrayList<>();
+		
 		for(int i = MIN_SIZE; i < MAX_SIZE; i++) {
 			sizeList.add(i);
 		}
+		
+		try {
+			this.user = (User)SessionManager.getAttribute("user");
+			System.out.println("User in dashboard : " + user.getFirstName());
+		} catch (Exception e) {
+			System.out.println("DashboardBean User Exception -> " + e);
+		}
+		petsList = (user != null ? user.getPetsList() : null);
 	}
 	
 	public String getPetName() {
@@ -146,31 +175,99 @@ public class DashboardBean {
 		this.petPhoto = petPhoto;
 	}
 
+	public void createSession() {
+		try {
+			if(user != null) {
+				System.out.println("User found , setting session attribute to true");
+				SessionManager.setAttribute(SessionManager.getUserLoggedInAttr(), true);
+			}
+			else {
+				System.out.println("User not found, setting session attribute to false");
+				SessionManager.setAttribute(SessionManager.getUserLoggedInAttr(), false);
+			}
+			
+		} catch (Exception e) {
+			System.out.println("DashboardBean createSession -> " + e);
+		}
+	}
 	
 	
 	public String getFirstName() {
-		if(isSessionActive()) {
+		createSession();
+		if((boolean)SessionManager.getAttribute("userLoggedIn")) {
 			return user.getFirstName();
 		}
 		return "";
 	}
 	
 	public boolean isShowAddPet() {
+		System.out.println("showAddPet : " + showAddPet);
 		return showAddPet;
 	}
 
 	public void setShowAddPet(boolean showAddPet) {
+		System.out.println("setting showAddPet to: " + showAddPet);
 		this.showAddPet = showAddPet;
 	}
 
 	public void addPet() {
-        setShowAddPet(true);
+		if(isShowAddPet()) {
+			setShowAddPet(false);
+		}
+		else
+			setShowAddPet(true);
     }
 	
+	public void viewRequests() {
+		if(isShowViewRequests()) {
+			setShowViewRequests(false);
+		}
+		else
+			setShowViewRequests(true);
+	}
+	
+	public void viewSentRequests() {
+		if(isShowViewSentRequests()) {
+			setShowViewSentRequests(false);
+		}
+		else
+			setShowViewSentRequests(true);
+	}
+	
 	public List<String> getCategoriesOptions(){
-		if(isSessionActive()) {
+		if((boolean)SessionManager.getAttribute("userLoggedIn")) {
 			petCategories = new ArrayList<String>(user.getPetCategories());
 			return petCategories;
+		}
+		else {
+			return null;
+		}
+	}
+	
+	public List<AdoptionRequestWrapper> getAdoptionRequests(){
+		if((boolean)SessionManager.getAttribute("userLoggedIn")) {
+			adoptionRequests = new ArrayList<AdoptionRequestWrapper>(user.getAdoptionRequests());
+			if(adoptionRequests.size() > 0) {
+			System.out.println("test getAdoptionRequests() -> " + adoptionRequests.get(0).getPetName() );
+			return adoptionRequests;
+			}
+			System.out.println("getAdoptionRequests() return NULL ");
+			return null;
+		}
+		else {
+			return null;
+		}
+	}
+	
+	public List<AdoptionRequestWrapper> getSentRequests(){
+		if((boolean)SessionManager.getAttribute("userLoggedIn")) {
+			adoptionRequests = new ArrayList<AdoptionRequestWrapper>(user.getMyAdoptionRequests());
+			if(adoptionRequests.size() > 0) {
+			System.out.println("test getSentRequests() -> " + adoptionRequests.get(0).getPetName() );
+			return adoptionRequests;
+			}
+			System.out.println("getSentRequests() return NULL ");
+			return null;
 		}
 		else {
 			return null;
@@ -218,6 +315,7 @@ public class DashboardBean {
 		
 		setShortDescription("");
 		setFullDescription("");
+		setShowAddPet(false);
 		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         try {
             externalContext.redirect(externalContext.getRequestContextPath() + "/dashboard.xhtml");
@@ -227,18 +325,27 @@ public class DashboardBean {
 	}
 	
 	
-	private boolean isSessionActive() {
-		if(user == null) {
-			System.out.println("user is null");
-			try {
-				externalContext.redirect("index.xhtml?faces-redirect=true");
-				return false;
-			} catch (IOException e) {
-				System.out.println(e);
-				e.printStackTrace();
-			}
+//	private boolean isSessionActive() {
+//		if(user == null) {
+//			System.out.println("user is null");
+//			try {
+//				
+//				externalContext.redirect("index.xhtml?faces-redirect=true");
+//				return false;
+//			} catch (IOException e) {
+//				System.out.println(e);
+//				e.printStackTrace();
+//			}
+//		}
+//		return true;
+//	}
+	
+	public boolean getTest() {
+		System.out.println("Checking user : " + (user != null));
+		if (user != null) {
+			return true;
 		}
-		return true;
+		return false;
 	}
 	
 	public void petNameValidator(FacesContext context, UIComponent comp, Object val) {
@@ -325,7 +432,11 @@ public class DashboardBean {
 		Pet.removePet(petName, user.getId());
 	}
 	
-	
+	public String logout() {
+		
+        SessionManager.invalidateSession();
+		return "/index.xhtml?faces-redirect=true";
+	}
 	
 	
 }

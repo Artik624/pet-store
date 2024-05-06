@@ -11,16 +11,26 @@
       <h:body>
 	      
 	      	<table style="border: 1px solid black">
-	
+			<tr>
+				<td>
+					<h:panelGroup rendered="#{petsBean.isUser}">
+					<h:form>
+						<h:commandButton value="Logout" action="#{dashboardBean.logout}"></h:commandButton> <br/>
+					</h:form>
+					</h:panelGroup>
+					<f:event type="preRenderView" listener="#{petsBean.checkSession()}" />
+				</td>
+			</tr>
 			<tr style="">
 				<td style="padding: 10px; ">
 					<h:form>
+						<input type="button" value="Back" onclick="window.history.back();" />
 					    <h:selectOneRadio value="#{petsBean.selectCategory}">
+					        <f:selectItems value="#{petsBean.petCategories}" />
 					        <f:selectItem itemValue=" " itemLabel="All" />
-					        <f:selectItem itemValue="dog" itemLabel="Dog" />
-					        <f:selectItem itemValue="cat" itemLabel="Cat" />
 					        <f:ajax render="allPets" />
 					    </h:selectOneRadio>
+					
 					</h:form>
 					<h:form id="allPets" enctype="multipart/form-data">
 						<ui:repeat id="petsTable" value="#{petsBean.allPets}" var="pet" >
@@ -31,8 +41,9 @@
 				            	<h:outputText value="Category: #{pet.category}" /><br/>
 				            	<h:outputText value="Short Description: #{pet.shortDescription}" /><br/>
 								<h:graphicImage library="images" name="#{pet.photo}" style="width: 100px; height:100px;"/><br/>
-			            	  	<h:commandButton value="View Pet" action="#{petsBean.viewPet}" immediate="true">
+			            	  	<h:commandButton value="View Pet" action="#{petsBean.viewPet}" >
 			            			<f:param name="id" value="#{pet.id}" />	
+			            			
 			            		</h:commandButton>
 								<br/>
 							</div>
@@ -44,7 +55,7 @@
 					</td>
 					<td >
 						<h:panelGroup id="viewPetDetails" rendered="#{petsBean.showPet}" value="#{petsBean.viewPet}" var="pet">
-							<h:form id="view" enctype="multipart/form-data" immediate="true" style="display: flex; flex-wrap: wrap;">
+							<h:form id="view" enctype="multipart/form-data" immediate="true" style="display: flex; flex-wrap: wrap;">  
 							 
 											<div style="flex: 0 0 60%; padding: 10px; border: 1px solid black">
 												<b>Name:</b> #{pet.name}<br /> 
@@ -60,20 +71,23 @@
 												<br/>
 							            		<br/>
 												<!-- TODO : FIX THIS BUTTON SO IT RENDERS THE NEXT FORM  -->
-							            	  	<h:commandButton value="Close" action="#{petsBean.viewPet}"/>
+							            	  	<h:commandButton value="Close" action="#{petsBean.setShowPet}"/>
 											</div>
 										<br/>
 										
 							 
 							</h:form>
-							<h:form id="test" enctype="multipart/form-data">
-								<h:commandButton value="Request Adoption" action="request_adoption.xhtml"  >
-									<f:param name="id" value="#{pet.id}" />
-								</h:commandButton>
+							<h:panelGroup rendered="#{petsBean.isUser}">
+								<h:form id="test" enctype="multipart/form-data">
+									<h:commandButton value="Request Adoption" action="#{petsBean.requestAdoption}"  >
+										<f:param name="id" value="#{pet.id}" />
+										<f:ajax execute="@this"></f:ajax>
+									</h:commandButton>
+								</h:form>
+							</h:panelGroup>
 								
 								 
 								
-							</h:form>
 						</h:panelGroup>
 					</td>
 					

@@ -1,10 +1,10 @@
 package pet_store;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
+//import java.util.Arrays;
 import java.util.List;
-import java.net.URI;
-import java.net.URISyntaxException;
+//import java.net.URI;
+//import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -149,7 +149,7 @@ public  class DbManager implements AutoCloseable {
 				//System.out.println("category added ");
 				categories.add(resultSet.getString(1));
             }
-			//System.out.println(Arrays.toString(categories.toArray()));
+			System.out.println("Categories length : " + categories.size());
 			return categories;
 		}
 		catch (Exception e) {
@@ -257,11 +257,11 @@ public  class DbManager implements AutoCloseable {
 		return pets;
 	}
 	
-	protected List<Pet> getPets(){
+	protected List<Pet> getPets(String user_id){
 		List<Pet> pets = new ArrayList<Pet>();
-		String getPetsSql = "SELECT * FROM pets ";
+		String getPetsSql = "SELECT * FROM pets WHERE owner_id!=?";
 		try(PreparedStatement statement = con.prepareStatement(getPetsSql)){
-			
+			statement.setString(1, user_id);
 			ResultSet resultSet = statement.executeQuery();
 			while(resultSet.next()) {
 				
@@ -293,7 +293,7 @@ public  class DbManager implements AutoCloseable {
 		return rowsAffected;
 	}
 	
-	protected List<Pet> getPetByID(String id) {
+	protected Pet getPetByID(String id) {
 		String getPetSql = "SELECT * FROM pets WHERE id=?";
 		List<Pet> pet = new ArrayList<Pet>();
 		try(PreparedStatement statement = con.prepareStatement(getPetSql)){
@@ -305,8 +305,8 @@ public  class DbManager implements AutoCloseable {
 	            		  resultSet.getBoolean("gender"), resultSet.getInt("age"), resultSet.getInt("weight"), resultSet.getInt("height"), resultSet.getInt("length"),
 	            		  resultSet.getString("short_description"), resultSet.getString("full_description"), resultSet.getString("photo")) ;
 	           System.out.println("Found pet with ID : " + id);
-	           pet.add(p);
-				return pet;
+	           //pet.add(p);
+				return p;
 			}
 			
 		}
@@ -388,6 +388,110 @@ public  class DbManager implements AutoCloseable {
 		return null;
 	}
 	
+	
+	protected void sendAdoptionRequestToDB(String petId, String requesterId, String ownerId, String messageToOwner) {
+		String insertAdoptionRequestSql = "INSERT INTO adoption_requests (pet_id, requester_id, owner_id, message) " +
+                "VALUES (?, ?, ?, ?)";
+		
+		int rowsAffected = 0;
+		try (PreparedStatement statement = con.prepareStatement(insertAdoptionRequestSql))
+		{
+			  statement.setString(1, petId);
+	          statement.setString(2, requesterId);
+	          statement.setString(3, ownerId);
+	          statement.setString(4, messageToOwner);
+	          
+          
+	          rowsAffected = statement.executeUpdate();
+	          System.out.println("Affected rows : " + rowsAffected);
+        // Checking the number of rows affected
+          
+          
+		} catch (Exception e) {
+			System.out.println("Exception in sendAdoptionRequestToDB() : " + e);
+			
+		}
+	}
+	
+	protected List<AdoptionRequestWrapper> getAdoptionRequestsForUser(String ownerId) {
+		List<AdoptionRequestWrapper> adoptionRequestsList = new ArrayList<>();
+		String getAdoptionRequestsSql =  "SELECT " +
+			    "    pets.name AS pet_name, " +
+			    "    CONCAT(users.first_name, ' ', users.last_name) AS requester_name, " +
+			    "    CONCAT(users.street_number, ' ', users.street, ' ', users.city) AS requester_address, " +
+			    "    users.phone AS requester_phone, " +
+			    "    adoption_requests.message AS request_message " +
+			    "FROM " +
+			    "    adoption_requests " +
+			    "JOIN " +
+			    "    users ON adoption_requests.requester_id = users.id " +
+			    "JOIN " +
+			    "    pets ON adoption_requests.pet_id = pets.id " +
+			    "WHERE " +
+			    "    adoption_requests.owner_id = ?;";
+		
+		try(PreparedStatement statement = con.prepareStatement(getAdoptionRequestsSql)){
+			
+			statement.setString(1, ownerId);
+			ResultSet resultSet = statement.executeQuery();
+			while (resultSet.next()) {
+	              //String hashedPass = resultSet.getString(1);
+				String pet_name = resultSet.getString(1);
+				String requester_name = resultSet.getString(2);
+				String requester_address = resultSet.getString(3);
+				int requester_phone = resultSet.getInt(4);
+				String requester_message = resultSet.getString(5);
+				AdoptionRequestWrapper request = new AdoptionRequestWrapper(pet_name, requester_name, requester_address,requester_phone, requester_message);
+	            adoptionRequestsList.add(request);
+	            System.out.println("test getAdoptionRequestsForUser() :" + adoptionRequestsList.get(0).getPetName());
+				
+			}
+		}
+		catch (Exception e){
+			System.out.println("Exception in getAdoptionRequestsForUser -> " + e);
+		}
+		return adoptionRequestsList;
+	}
+	
+	protected List<AdoptionRequestWrapper> getAdoptionRequestsByUser(String requesterId) {
+		List<AdoptionRequestWrapper> myAdoptionRequestsList = new ArrayList<>();
+		String getMyAdoptionRequestsSql =  "SELECT " +
+				"    pets.name AS pet_name, " +
+				"    CONCAT(users.first_name, ' ', users.last_name) AS owner_name, " +
+				"    CONCAT(users.street_number, ' ', users.street, ' ', users.city) AS owner_address, " +
+				"    users.phone AS owner_phone, " +
+				"    adoption_requests.message AS request_message " +
+				"FROM " +
+				"    adoption_requests " +
+				"JOIN " +
+				"    users ON adoption_requests.owner_id = users.id " +
+				"JOIN " +
+				"    pets ON adoption_requests.pet_id = pets.id " +
+				"WHERE " +
+				"    adoption_requests.requester_id = ?;";
+		
+		try(PreparedStatement statement = con.prepareStatement(getMyAdoptionRequestsSql)){
+			
+			statement.setString(1, requesterId);
+			ResultSet resultSet = statement.executeQuery();
+			while (resultSet.next()) {
+				//String hashedPass = resultSet.getString(1);
+				String pet_name = resultSet.getString(1);
+				String owner_name = resultSet.getString(2);
+				String owner_address = resultSet.getString(3);
+				int owner_phone = resultSet.getInt(4);
+				String requester_message = resultSet.getString(5);
+				AdoptionRequestWrapper request = new AdoptionRequestWrapper(pet_name, owner_name, owner_phone, owner_name, requester_message);
+				myAdoptionRequestsList.add(request);
+				System.out.println("test getAdoptionRequestsByForUser() :" + myAdoptionRequestsList.get(0).getPetName());
+				
+			}
+		}
+		catch (Exception e){
+			System.out.println("Exception in getAdoptionRequestsByUser -> " + e);
+		}
+		return myAdoptionRequestsList;
+	}
 	
 	
 }

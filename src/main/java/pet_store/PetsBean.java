@@ -1,30 +1,39 @@
 package pet_store;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
 import javax.faces.bean.SessionScoped;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpSession;
+//import javax.servlet.http.HttpSession;
 
 @SuppressWarnings("deprecation")
 @ManagedBean
-@SessionScoped
+@ViewScoped
 public class PetsBean {
 
 	private FacesContext facesContext = FacesContext.getCurrentInstance();
 	private ExternalContext externalContext = facesContext.getExternalContext();
-	private HttpSession session = (HttpSession) externalContext.getSession(false);
-	private User user = (User)session.getAttribute("user");
+	//private HttpSession session = (HttpSession) externalContext.getSession(false);
+	private User user = null;
 	private static DbManager dbLink = DbManager.getDbManagerInstance();
-	private List<Pet> viewPet = null;
+	//private List<Pet> viewPet = null;
+	private Pet pet = null;
 	private boolean showPet = false;
 	private boolean isUser = false;
 	private boolean adoptionRequested = false;
+	
+	@PostConstruct
+	private void init() {
+		user = (User)SessionManager.getAttribute("user");
+	}
+	
 	
 	public boolean getAdoptionRequested() {
 		System.out.println("getting aR : " +adoptionRequested);
@@ -42,29 +51,27 @@ public class PetsBean {
 	}
 
 
-	public void setUser() {
-		this.user = (User)session.getAttribute("user");
+	public void setShowPet() {
+		if(showPet)
+			showPet = false;
+		else
+			showPet = true;
 	}
 
 
 	public boolean getIsUser() {
-		setIsUser();
 		return isUser;
 	}
 
 
-	public void setIsUser() {
-		if(getUser() == null) {
-			isUser = false;
-		}
-		else {
-			isUser = true;
-		}
+	public void setIsUser(boolean isSession) {
+			isUser = isSession;
+		
 	}
 
 
 	
-	private String selectCategory ="";
+	private String selectCategory =" ";
 	public String getSelectCategory() {
 		return selectCategory;
 	}
@@ -77,7 +84,11 @@ public class PetsBean {
 
 	public List<Pet> getAllPets(){
 		System.out.println("Getting all Pets");
-		List<Pet> petsList = dbLink.getPets();
+		List<Pet> petsList;
+		if(user == null)
+			petsList = dbLink.getPets("");
+		else
+			petsList = dbLink.getPets(user.getId());
 		System.out.println("Pets Length : " + petsList.size());
 		return petsList;
 	}
@@ -89,25 +100,23 @@ public class PetsBean {
 			Map<String,String> params = externalContext.getRequestParameterMap();
 			String id = params.get("id");
 			System.out.println("Getting pet by ID: " + id);
-			viewPet=  dbLink.getPetByID(id);
+			this.pet = dbLink.getPetByID(id);
 		}
-		else {
-			showPet = false;
-		}
+		
 		
 	}
 	
 	
 
 
-	public List<Pet> getViewPet() {
-		return viewPet;
-	}
-
-
-	public void setViewPet(List<Pet> viewPet) {
-		this.viewPet = viewPet;
-	}
+//	public List<Pet> getViewPet() {
+//		return viewPet;
+//	}
+//
+//
+//	public void setViewPet(List<Pet> viewPet) {
+//		this.viewPet = viewPet;
+//	}
 
 
 	public boolean getShowPet() {
@@ -119,13 +128,31 @@ public class PetsBean {
 		this.showPet = showPet;
 	}
 	
-	public void test() {
-		System.out.println("requesting adoption : " + adoptionRequested);
-		setShowPet(true);
-		setAdoptionRequested(true);
-		Map<String,String> params = externalContext.getRequestParameterMap();
-		String id = params.get("id");
-		System.out.println("Getting pet by ID in test: " + id);
-		
+	public String requestAdoption() {
+		System.out.println("In req adoption func pet : " + pet.getId());
+		SessionManager.setAttribute("petId", pet.getId());
+		return "request_adoption.xhtml?faces-redirect=true";
+	}
+	
+	
+	public List<String> getPetCategories(){
+		System.out.println("getting categories in petsbean");
+		List<String> categories = dbLink.getCategories();
+		System.out.println(Arrays.toString(categories.toArray()));
+		return categories;
+
+	}
+	
+	public void checkSession() {
+		try {
+			boolean test = SessionManager.checkSessionExists();
+			if(!test)
+				SessionManager.createSession(user);
+			System.out.println("PetsBean Check Session value: " + test);
+			setIsUser(test);
+		} catch (Exception e) {
+			System.out.println("PetsBean Check Session not found");
+			setIsUser(false);
+		}
 	}
 }
