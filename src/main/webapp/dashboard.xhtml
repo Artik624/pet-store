@@ -32,24 +32,24 @@
 							<br />
 							<h:commandButton id="addPet" value="#{dashboardBean.showAddPet ? 'Close' : 'Add Pet'}"
 								action="#{dashboardBean.addPet}" immediate="true" >
-								<f:ajax execute="@this" render="@this addPetFormPanel" />
+								<f:ajax execute="@this" render="@this addPetFormPanel addViewRequestsFormPanel viewRequests addViewSentRequestsFormPanel viewSentRequests" />
 								
 							</h:commandButton>
 							<br />
 							<h:commandButton id="viewRequests" value="#{dashboardBean.showViewRequests ? 'Close' : 'View Recieved Requests'}"
 								action="#{dashboardBean.viewRequests}" immediate="true" >
-								<f:ajax render="@this addViewRequestsFormPanel " />
+								<f:ajax render="@this addViewRequestsFormPanel addPetFormPanel addPet addViewSentRequestsFormPanel viewSentRequests" />
 								
 							</h:commandButton>
 							<br />
 							<h:commandButton id="viewSentRequests" value="#{dashboardBean.showViewSentRequests ? 'Close' : 'View Sent Requests'}"
 								action="#{dashboardBean.viewSentRequests}" immediate="true" >
-								<f:ajax render="@this addViewSentRequestsFormPanel " />
+								<f:ajax render="@this addViewSentRequestsFormPanel addPetFormPanel addPet addViewRequestsFormPanel viewRequests" />
 								
 							</h:commandButton>
 							<br />
 							<h:form>
-								<h:commandButton id="viewPets" value="viewPets"
+								<h:commandButton id="viewPets" value="View All Pets"
 									action="view_pets.xhtml?faces-redirect=true">
 								</h:commandButton>
 							</h:form>

@@ -214,24 +214,41 @@ private ExternalContext externalContext = facesContext.getExternalContext();
 		if(isShowAddPet()) {
 			setShowAddPet(false);
 		}
-		else
+		else {
 			setShowAddPet(true);
+			if(isShowViewRequests())
+				setShowViewRequests(false);
+			if(isShowViewSentRequests())
+				setShowViewSentRequests(false);
+		}
     }
 	
 	public void viewRequests() {
 		if(isShowViewRequests()) {
 			setShowViewRequests(false);
 		}
-		else
+		else {
 			setShowViewRequests(true);
+			if(isShowViewSentRequests())
+				setShowViewSentRequests(false);
+			if(isShowAddPet())
+				setShowAddPet(false);
+			
+		}
 	}
 	
 	public void viewSentRequests() {
 		if(isShowViewSentRequests()) {
 			setShowViewSentRequests(false);
 		}
-		else
+		else {
 			setShowViewSentRequests(true);
+			if(isShowAddPet())
+				setShowAddPet(false);
+			if(isShowViewRequests())
+				setShowViewRequests(false);
+			
+		}
 	}
 	
 	public List<String> getCategoriesOptions(){
