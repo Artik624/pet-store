@@ -28,7 +28,18 @@ public class PetsBean {
 	private boolean showPet = false;
 	private boolean isUser = false;
 	private boolean adoptionRequested = false;
+	private String message ="";
 	
+	public String getMessage() {
+		return message;
+	}
+
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+
 	@PostConstruct
 	private void init() {
 		user = (User)SessionManager.getAttribute("user");
@@ -129,9 +140,15 @@ public class PetsBean {
 	}
 	
 	public String requestAdoption() {
-		System.out.println("In req adoption func pet : " + pet.getId());
-		SessionManager.setAttribute("petId", pet.getId());
-		return "request_adoption.xhtml?faces-redirect=true";
+		if(!user.checkIfAdoptionReqeuested(pet.getId())){
+			System.out.println("In req adoption func pet : " + pet.getId());
+			SessionManager.setAttribute("petId", pet.getId());
+			return "request_adoption.xhtml?faces-redirect=true";
+		}
+		else {
+			setMessage("You already requested adoption for this pet");
+			return "";
+		}
 	}
 	
 	

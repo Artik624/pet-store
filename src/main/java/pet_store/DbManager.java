@@ -493,5 +493,25 @@ public  class DbManager implements AutoCloseable {
 		return myAdoptionRequestsList;
 	}
 	
+	protected boolean isAdoptionRequestExists(String pet_id, String requester_id) {
+		String checkRequestExistsSql = "SELECT * from adoption_requests WHERE pet_id=? and requester_id=?";
+		try(PreparedStatement statement = con.prepareStatement(checkRequestExistsSql)){
+			
+			statement.setString(1, pet_id);
+			statement.setString(2, requester_id);
+			ResultSet resultSet = statement.executeQuery();
+			if (resultSet.next()) {
+				System.out.println("Adoption request found for user and pet");
+				return true;
+			}
+		}
+		catch (Exception e){
+			System.out.println("Exception in isAdoptionRequestExists() -> " + e);
+		}
+		
+		return false;
+	}
+	
+	
 	
 }

@@ -196,5 +196,9 @@ public class User {
 		return dbLink.getAdoptionRequestsByUser(id);
 	}
 	
+	public boolean checkIfAdoptionReqeuested(String pet_id) {
+		return dbLink.isAdoptionRequestExists(pet_id, id);
+	}
+	
 	
 }

@@ -81,8 +81,10 @@
 								<h:form id="test" enctype="multipart/form-data">
 									<h:commandButton value="Request Adoption" action="#{petsBean.requestAdoption}"  >
 										<f:param name="id" value="#{pet.id}" />
-										<f:ajax execute="@this"></f:ajax>
+										<f:ajax execute="@this" render="requestAdoptionMessage"></f:ajax>
 									</h:commandButton>
+									<br/>
+									<h:outputLabel id="requestAdoptionMessage" value="#{petsBean.message}"></h:outputLabel>
 								</h:form>
 							</h:panelGroup>
 								
