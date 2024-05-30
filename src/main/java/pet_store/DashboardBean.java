@@ -1,35 +1,41 @@
 package pet_store;
 
 import java.io.*;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
+/**
+ * Managed Bean class for the dashboard.xhtml backend
+ * @author Artiom Cooper
+ */
+@SuppressWarnings("deprecation")
 @ManagedBean
 @SessionScoped
 public class DashboardBean {
 
 	
-private FacesContext facesContext = FacesContext.getCurrentInstance();
-private ExternalContext externalContext = facesContext.getExternalContext();
-//	private HttpSession session = (HttpSession) externalContext.getSession(true);
+	private FacesContext facesContext;
+	private ExternalContext externalContext;
 	private User user;
-	
-	
+	private String userName;
+
 	private String petName;
 	private String petCategory;
 	private String petGender;
+	private String newCategory;
+	
+
 	private int petAge;
 	private int petWeight;
 	private int petHeight;
@@ -41,14 +47,12 @@ private ExternalContext externalContext = facesContext.getExternalContext();
 	
 	private int MIN_NAME_LENGTH = 2;
 	private int MAX_NAME_LENGTH = 10;
-	private int MIN_AGE = 0;
-	private int MAX_AGE = 100;
 	private int MIN_SIZE = 0;
 	private int MAX_SIZE = 100;
 	
 	
 	
-	
+	private SessionManager session;
 	private List<AdoptionRequestWrapper> adoptionRequests;
 	private List<String> petCategories;
 	private List<String> gendersList;
@@ -56,8 +60,93 @@ private ExternalContext externalContext = facesContext.getExternalContext();
 	private boolean showAddPet;
 	private boolean showViewRequests;
 	private boolean showViewSentRequests;
+	private boolean showAddCategory;
+	private String message;
 	
+
+	/**
+	 * Acts as constructor for the JSF FW. Sets up variables and checks a user is logged in, otherwise redirects to main page
+	 */
+	@PostConstruct
+	public void init() {
+		message = "";
+		newCategory = "";
+		showAddPet = false;
+		showViewRequests = false;
+		showViewSentRequests = false;
+		showAddCategory = false;
+		petCategories = new ArrayList<>();
+		gendersList = new ArrayList<>();
+		gendersList.add("male");
+		gendersList.add("female");
+		sizeList = new ArrayList<>();
+		session = new SessionManager();
+		facesContext = session.getFacesContext();
+		externalContext = session.getExternalContext();
+		
+		if(session != null) {
+			System.out.println("Session detected in dashboard");
+			user = (User)session.getAttribute("user");
+			if(user != null) {
+				System.out.println("User detected in dashboard: " +user.getFirstName()+", "+user.getLastName());
+				session.createSession(user);
+				userName = ""+user.getFirstName()+" "+ user.getLastName();
+				for(int i = MIN_SIZE; i < MAX_SIZE; i++) {
+					sizeList.add(i);
+				}
+			}
+			else {
+				System.out.println("User is null in dashbnoard");
+				try {
+					externalContext.redirect(externalContext.getRequestContextPath() + "/index.xhtml");
+					
+				} catch (Exception e) {
+					System.out.println("Exception in Dashboard init()-> " + e);
+				}			
+			}
+		}
+		else {
+			System.out.println("No SESSION FOUND");			
+		}
+	}
 	
+	@PreDestroy
+	public void destory() {
+		user = null;
+		session = null;
+	}
+	
+	//Getters & Setters
+	public String getUserName() {
+		return userName;
+	}
+	
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	public String getNewCategory() {
+		return newCategory;
+	}
+	
+	public void setNewCategory(String newCategory) {
+		this.newCategory = newCategory;
+	}
+	
+	public String getMessage() {
+		return message;
+	}
+	
+	public void setMessage(String message) {
+		this.message = message;
+	}
+	
+	public boolean isShowAddCategory() {
+		return showAddCategory;
+	}
+	
+	public void setShowAddCategory(boolean showAddCategory) {
+		this.showAddCategory = showAddCategory;
+	}
 	
 	public boolean isShowViewSentRequests() {
 		return showViewSentRequests;
@@ -75,25 +164,6 @@ private ExternalContext externalContext = facesContext.getExternalContext();
 		this.showViewRequests = showViewRequests;
 	}
 
-	public void initDashboard() {
-		petCategories = new ArrayList<>();
-		gendersList = new ArrayList<>();
-		gendersList.add("male");
-		gendersList.add("female");
-		sizeList = new ArrayList<>();
-		
-		for(int i = MIN_SIZE; i < MAX_SIZE; i++) {
-			sizeList.add(i);
-		}
-		
-		try {
-			this.user = (User)SessionManager.getAttribute("user");
-			System.out.println("User in dashboard : " + user.getFirstName());
-		} catch (Exception e) {
-			System.out.println("DashboardBean User Exception -> " + e);
-		}
-		petsList = (user != null ? user.getPetsList() : null);
-	}
 	
 	public String getPetName() {
 		return petName;
@@ -174,40 +244,43 @@ private ExternalContext externalContext = facesContext.getExternalContext();
 	public void setPetPhoto(Part petPhoto) {
 		this.petPhoto = petPhoto;
 	}
-
-	public void createSession() {
-		try {
-			if(user != null) {
-				System.out.println("User found , setting session attribute to true");
-				SessionManager.setAttribute(SessionManager.getUserLoggedInAttr(), true);
-			}
-			else {
-				System.out.println("User not found, setting session attribute to false");
-				SessionManager.setAttribute(SessionManager.getUserLoggedInAttr(), false);
-			}
-			
-		} catch (Exception e) {
-			System.out.println("DashboardBean createSession -> " + e);
-		}
+	
+	public List<Pet> getPetsList(){
+		petsList = (user != null ? user.getPetsList() : null);
+		return petsList;
 	}
 	
-	
-	public String getFirstName() {
-		createSession();
-		if((boolean)SessionManager.getAttribute("userLoggedIn")) {
-			return user.getFirstName();
-		}
-		return "";
+	public int getNumberOfPets() {
+		return petsList.size();
 	}
 	
 	public boolean isShowAddPet() {
-		System.out.println("showAddPet : " + showAddPet);
 		return showAddPet;
 	}
 
 	public void setShowAddPet(boolean showAddPet) {
-		System.out.println("setting showAddPet to: " + showAddPet);
 		this.showAddPet = showAddPet;
+	}
+	
+	public List<String> getGendersOptions(){
+		return gendersList;
+	}
+	
+	public List<Integer> getSizeOptions(){
+		return sizeList;
+	}
+	
+	//End of Getters & Setters
+	
+	
+	/**
+	 * Manages the buttons text values when Add Category Button is clicked
+	 */
+	public void addCategory() {
+		if(isShowAddCategory())
+			setShowAddCategory(false);
+		else
+			setShowAddCategory(true);
 	}
 
 	public void addPet() {
@@ -223,6 +296,9 @@ private ExternalContext externalContext = facesContext.getExternalContext();
 		}
     }
 	
+	/**
+	 * Manages the buttons text values when Received Requests Button is clicked
+	 */
 	public void viewRequests() {
 		if(isShowViewRequests()) {
 			setShowViewRequests(false);
@@ -237,6 +313,9 @@ private ExternalContext externalContext = facesContext.getExternalContext();
 		}
 	}
 	
+	/**
+	 * Manages the buttons text values when Sent Requests Button is clicked
+	 */
 	public void viewSentRequests() {
 		if(isShowViewSentRequests()) {
 			setShowViewSentRequests(false);
@@ -251,8 +330,12 @@ private ExternalContext externalContext = facesContext.getExternalContext();
 		}
 	}
 	
+	/**
+	 * Retrieve the pet categories from DB
+	 * @return list of categories
+	 */
 	public List<String> getCategoriesOptions(){
-		if((boolean)SessionManager.getAttribute("userLoggedIn")) {
+		if((boolean)session.getAttribute("userLoggedIn")) {
 			petCategories = new ArrayList<String>(user.getPetCategories());
 			return petCategories;
 		}
@@ -261,14 +344,17 @@ private ExternalContext externalContext = facesContext.getExternalContext();
 		}
 	}
 	
+	/**
+	 * Retrieves the received adoption requests from DB
+	 * @return List of requests or null
+	 */
 	public List<AdoptionRequestWrapper> getAdoptionRequests(){
-		if((boolean)SessionManager.getAttribute("userLoggedIn")) {
+		if((boolean)session.getAttribute("userLoggedIn")) {
 			adoptionRequests = new ArrayList<AdoptionRequestWrapper>(user.getAdoptionRequests());
 			if(adoptionRequests.size() > 0) {
-			System.out.println("test getAdoptionRequests() -> " + adoptionRequests.get(0).getPetName() );
-			return adoptionRequests;
+				return adoptionRequests;
 			}
-			System.out.println("getAdoptionRequests() return NULL ");
+			System.out.println("DashboardBean.getAdoptionRequests() returns NULL ");
 			return null;
 		}
 		else {
@@ -276,14 +362,17 @@ private ExternalContext externalContext = facesContext.getExternalContext();
 		}
 	}
 	
+	/**
+	 * Retrieves adoption requests sent by User
+	 * @return list of requests or null
+	 */
 	public List<AdoptionRequestWrapper> getSentRequests(){
-		if((boolean)SessionManager.getAttribute("userLoggedIn")) {
+		if((boolean)session.getAttribute("userLoggedIn")) {
 			adoptionRequests = new ArrayList<AdoptionRequestWrapper>(user.getMyAdoptionRequests());
 			if(adoptionRequests.size() > 0) {
-			System.out.println("test getSentRequests() -> " + adoptionRequests.get(0).getPetName() );
-			return adoptionRequests;
+				return adoptionRequests;
 			}
-			System.out.println("getSentRequests() return NULL ");
+			System.out.println("DashboardBean.getSentRequests() return NULL ");
 			return null;
 		}
 		else {
@@ -291,40 +380,23 @@ private ExternalContext externalContext = facesContext.getExternalContext();
 		}
 	}
 	
-	public List<String> getGendersOptions(){
-		return gendersList;
-	}
-	
-	public List<Integer> getSizeOptions(){
-		return sizeList;
-	}
-	
+	/**
+	 * Adds new pet to DB with values entered by user 
+	 */
 	public void addNewPet() {
-		System.out.println("test");
-//		System.out.println("Name: " + getPetName() +
-//				"\nGender: " + getPetGender()+
-//				"\nCategory: " + getPetCategory()+
-//				"\nage: "+getPetAge()+
-//				"\nweight: "+getPetWeight()+
-//				"\nheight: "+getPetHeight()+
-//				"\nShort desc : " + getShortDescription()+
-//				"\nFull desc : " + getFullDescription()+
-//				"\nphoto Path : " + uploadPhoto());
-		
 		String photoPath = uploadPhoto();
-		System.out.println("Photo path : "  + photoPath);
 		if(getPetName() != null && getShortDescription() != null && getFullDescription() != null) {
 			Pet newPet = new Pet(user.getId(), 
-					getPetCategory(), 
-					getPetName(), 
-					getPetGender(), 
-					getPetAge(), 
-					getPetWeight(), 
-					getPetHeight(), 
-					getPetLength(), 
-					getShortDescription(), 
-					getFullDescription(), 
-					photoPath);
+								getPetCategory(), 
+								getPetName(), 
+								getPetGender(), 
+								getPetAge(), 
+								getPetWeight(), 
+								getPetHeight(), 
+								getPetLength(), 
+								getShortDescription(), 
+								getFullDescription(), 
+								photoPath);
 			
 			newPet.sendToDb();
 			
@@ -337,38 +409,22 @@ private ExternalContext externalContext = facesContext.getExternalContext();
         try {
             externalContext.redirect(externalContext.getRequestContextPath() + "/dashboard.xhtml");
         } catch (IOException e) {
-            e.printStackTrace(); // Handle the exception
+            System.out.println("Exception in DashboardBean.addNewPet() -> " + e);
         }
 	}
 	
-	
-//	private boolean isSessionActive() {
-//		if(user == null) {
-//			System.out.println("user is null");
-//			try {
-//				
-//				externalContext.redirect("index.xhtml?faces-redirect=true");
-//				return false;
-//			} catch (IOException e) {
-//				System.out.println(e);
-//				e.printStackTrace();
-//			}
-//		}
-//		return true;
-//	}
-	
-	public boolean getTest() {
-		System.out.println("Checking user : " + (user != null));
-		if (user != null) {
-			return true;
-		}
-		return false;
-	}
-	
+
+	/**
+	 * Validator To check that the pet name is valid and unique for the user.
+	 * Sets an appropriate message
+	 * @param context
+	 * @param comp
+	 * @param val
+	 */
 	public void petNameValidator(FacesContext context, UIComponent comp, Object val) {
 		String petName = (String)val;
 		FacesMessage message;
-		
+		List<Pet> myPets = user.getPetsList();
 		if(!petName.matches("^[a-zA-Z]+")) {
 			message = new FacesMessage("Name can only contain letters");
 		}
@@ -381,33 +437,20 @@ private ExternalContext externalContext = facesContext.getExternalContext();
 			message = new FacesMessage("OK");
 			this.petName = petName;
 		}
-		context.addMessage(comp.getClientId(context), message);
-	}
-	
-	public void petAgeValidator(FacesContext context, UIComponent comp, Object val) {
-		String petAge = (String)val;
-		FacesMessage message;
 		
-		if(!petAge.matches("^[0-9]+")) {
-			message = new FacesMessage("Age can only contain numbers");
-		}
-		else {
-			int age = Integer.parseInt(petAge);
-			if(age > MAX_AGE || age < MIN_AGE) {
-				
-				message = new FacesMessage(String.format("Age cannot be more than %d and less than %d Character", MAX_AGE, MIN_AGE));
+		for(Pet pet : myPets) {
+			if(petName.equals(pet.getName())) {
+				message = new FacesMessage("You already have a pet with that name");
 			}
-			else{
-				
-				message = new FacesMessage("OK");
-				this.petAge = age;
-			}
-			
 		}
-			
+		
 		context.addMessage(comp.getClientId(context), message);
 	}
 	
+	/**
+	 * uploads a photo of the pet to a specific path 
+	 * @return photo path or empty string
+	 */
 	public String uploadPhoto() {
 		String userId = user.getId();
 		String userResourcePath = DbManager.IMGS_FULL_PATH.resolve(userId).toString();
@@ -427,32 +470,56 @@ private ExternalContext externalContext = facesContext.getExternalContext();
             }
             return petPhotoRelativePath;
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Exception in DashboardBean.uploadPhoto()-> " + e);
             return "";
         }
     }
 	
-	public List<Pet> getPetsList(){
-		petsList = (user != null ? user.getPetsList() : null);
-		return petsList;
-	}
-	
-	public int getNumberOfPets() {
-		return petsList.size();
-	}
-	
-	
+	/**
+	 * Removes a pet from DB
+	 */
 	public void removePet() {
 		Map<String,String> params = externalContext.getRequestParameterMap();
-		String petName = params.get("petName");
-		
-		Pet.removePet(petName, user.getId());
+		String petId = params.get("petId");
+		Pet.removePet(petId, user.getId());
+	}
+
+	/**
+	 * Adds a new category to DB , checks that input is valid and sets appropriate message
+	 */
+	public void submitCategory() {
+		if(!newCategory.isBlank() && !newCategory.isEmpty() && newCategory.matches("[a-zA-Z]+")) {
+			if(user.addNewCategory(newCategory)) {
+				setMessage("Category added : " + newCategory);
+				setNewCategory("");
+				
+			}
+			else {
+				setMessage("Failed to add category : " + newCategory);
+				setNewCategory("");
+			}
+			
+		}
+		else {
+			setMessage("New category cant be empty");
+			setNewCategory("");
+		}
 	}
 	
-	public String logout() {
-		
-        SessionManager.invalidateSession();
-		return "/index.xhtml?faces-redirect=true";
+	/**
+	 * Helper method to logout user and invalidate session
+	 */
+	public void logout() {
+		session.invalidateSession();
+	}
+	
+	/**
+	 * Removes an adoption request sent by the logged in user
+	 */
+	public void cancelSentAdoptionRequest() {
+		Map<String,String> params = externalContext.getRequestParameterMap();
+		String id = params.get("id");
+		user.removeSentRequest(Pet.getPetById(id));
 	}
 	
 	

@@ -1,0 +1,62 @@
+@charset "ISO-8859-1";
+
+body{
+	background-color: #cdebf7;
+}
+
+h1 {
+    font-size: 24px;
+    color: #00a2e8;
+    
+}
+
+.commandButton {
+    width: auto;
+    padding: 10px;
+    margin: 20px 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #00a2e8;
+    color: white;
+    font-weight: bold;
+    box-shadow: 3px 3px #0768a1;
+    cursor: pointer;
+}
+
+.commandButton:hover {
+    background-color: #007bb5;
+}
+
+.pet-details-section {
+	display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    min-width:99%;
+    width: fit-content;
+    margin: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #ebe6f7;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+}
+
+.pet-info,
+.owner-info,
+.message-form {
+    display: flex; 
+    align-items: center; 
+    flex-direction: column; 
+	border: 1px solid black;
+	padding :10px;
+	margin: 5px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+    background-color: #ffffdf;
+}
+
+.pet-info img{
+	margin-top: 10px;
+	border-radius: 10px;
+}
+
+

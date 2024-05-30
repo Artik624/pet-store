@@ -8,194 +8,238 @@
       	<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
       	<title>Dashboard </title>
+      	<h:outputStylesheet library="css" name="dashboard.css"/>
       	
       </h:head>
-      <h:body>
-      	<f:metadata>
-        	<f:event type="preRenderView" listener="#{dashboardBean.initDashboard()}" />
-    	</f:metadata>
-      	<h:outputText value="Welcome, #{dashboardBean.firstName}"> </h:outputText>
-		<table style="border: 1px solid black">
-			<tr>
-				<td>
-					<h:form>
-						<h:commandButton value="Logout" action="#{dashboardBean.logout}"></h:commandButton>
-						<input type="button" value="Back" onclick="window.history.back();" />
-						
-					</h:form>
-					
-				</td>
-			</tr>
-			<tr style="">
-				<td style="padding: 10px; vertical-align: top; width: 5%">
-					<h:form id="addPetForm" enctype="multipart/form-data">
-							<br />
-							<h:commandButton id="addPet" value="#{dashboardBean.showAddPet ? 'Close' : 'Add Pet'}"
-								action="#{dashboardBean.addPet}" immediate="true" >
-								<f:ajax execute="@this" render="@this addPetFormPanel addViewRequestsFormPanel viewRequests addViewSentRequestsFormPanel viewSentRequests" />
-								
+      <h:body >
+      	<h:outputText value="Welcome #{dashboardBean.userName}" styleClass="h1"> </h:outputText><br/>
+		<div class="container">
+			<div class="sub-container">
+				<h:form class="actions">
+					<h:commandButton value="Logout" action="#{dashboardBean.logout}" styleClass="commandButton"></h:commandButton>
+					<br/>
+					<input type="button" value="Back" onclick="window.history.back();" class="commandButton"/>
+					<br />
+					<h:commandButton id="addPet" value="#{dashboardBean.showAddPet ? 'Close' : 'Add Pet'}"
+						action="#{dashboardBean.addPet}" immediate="true" styleClass="commandButton">
+						<f:ajax render="@this @form 
+										:viewsForm:addPetFormPanel 
+										:viewsForm:addViewRequestsFormPanel 
+										:viewsForm:viewRequests 
+										:viewsForm:addViewSentRequestsFormPanel :
+										viewsForm:viewSentRequests" />
+					</h:commandButton>
+					<br />
+					<h:commandButton id="viewRequests" value="#{dashboardBean.showViewRequests ? 'Close' : 'Recieved Requests'}"
+						action="#{dashboardBean.viewRequests}" immediate="true" styleClass="commandButton">
+						<f:ajax render="@this @form
+										:viewsForm:addViewRequestsFormPanel 
+										:viewsForm:addPetFormPanel 
+										:viewsForm:addPet 
+										:viewsForm:addViewSentRequestsFormPanel 
+										:viewsForm:viewSentRequests" />
+					</h:commandButton>
+					<br />
+					<h:commandButton id="viewSentRequests" value="#{dashboardBean.showViewSentRequests ? 'Close' : 'Sent Requests'}"
+						action="#{dashboardBean.viewSentRequests}" immediate="true" styleClass="commandButton">
+						<f:ajax render="@this @form
+										:viewsForm:addViewSentRequestsFormPanel 
+										:viewsForm:addPetFormPanel 
+										:viewsForm:addPet 
+										:viewsForm:addViewRequestsFormPanel 
+										:viewsForm:viewRequests" />
+					</h:commandButton>
+					<br />
+					<h:commandButton id="viewPets" value="View All Pets"
+						action="view_pets.xhtml?faces-redirect=true" styleClass="commandButton">
+						<f:ajax execute="@this"></f:ajax>
+					</h:commandButton>
+					<br />
+				</h:form>
+
+				<h:form class="content" id="viewsForm" enctype="multipart/form-data">
+					<div id="addPetFormPanel" class="panel">
+					<h:panelGroup id="addPetFormPanel">
+						<h:panelGroup id="petSubmittionPanel" rendered="#{dashboardBean.showAddPet}">
+							<h1>Add Pet</h1>
+							<h:outputLabel for="petName">Enter pet name: </h:outputLabel>
+							<h:inputText id="petName" required="true" requiredMessage="Required" validator="#{dashboardBean.petNameValidator}" ></h:inputText>
+							<h:message for="petName" />
+							<br /><br/>
+	
+							<h:outputLabel for="petGender">Choose pet gender: </h:outputLabel>
+							<h:selectOneMenu id="petGender"  value="#{dashboardBean.petGender}" resetInput="true" required="true" requiredMessage="Required">
+								<f:selectItem itemLabel="" itemValue="" />
+								<f:selectItems value="#{dashboardBean.gendersOptions}" />
+							</h:selectOneMenu>
+							<h:message for="petGender"></h:message>
+							<br /><br/>
+							<h:commandButton id="addCategoryBtn" value="#{dashboardBean.showAddCategory ? 'Close' : 'Add Category'}" 
+								action="#{dashboardBean.addCategory}" immediate="true" styleClass="commandButton">
+							<f:ajax  render="@this addPetFormPanel petSubmittionPanel addCategoryPanel"></f:ajax>
 							</h:commandButton>
-							<br />
-							<h:commandButton id="viewRequests" value="#{dashboardBean.showViewRequests ? 'Close' : 'View Recieved Requests'}"
-								action="#{dashboardBean.viewRequests}" immediate="true" >
-								<f:ajax render="@this addViewRequestsFormPanel addPetFormPanel addPet addViewSentRequestsFormPanel viewSentRequests" />
-								
-							</h:commandButton>
-							<br />
-							<h:commandButton id="viewSentRequests" value="#{dashboardBean.showViewSentRequests ? 'Close' : 'View Sent Requests'}"
-								action="#{dashboardBean.viewSentRequests}" immediate="true" >
-								<f:ajax render="@this addViewSentRequestsFormPanel addPetFormPanel addPet addViewRequestsFormPanel viewRequests" />
-								
-							</h:commandButton>
-							<br />
-							<h:form>
-								<h:commandButton id="viewPets" value="View All Pets"
-									action="view_pets.xhtml?faces-redirect=true">
+							
+							<br/>
+							<h:panelGroup id="addCategoryPanel" rendered="#{dashboardBean.showAddCategory}">
+							<h:form id="addCategoryForm">
+							<div >
+								<h:outputLabel for="inputCategory">New Category</h:outputLabel>
+								<br/>
+								<h:inputText id="inputCategory" value="#{dashboardBean.newCategory}"></h:inputText>
+								<h:commandButton value="Submit Category" action="#{dashboardBean.submitCategory}" styleClass="commandButton">
+									<f:ajax execute="@this addCategoryForm addPetFormPanel " 
+											render="viewsForm addCategoryForm:inputCategory addCategoryForm:sbmtCategoryMsg" 
+											resetValues="addCategoryForm:inputCategory addCategoryForm:sbmtCategoryMsg">
+									</f:ajax>
 								</h:commandButton>
+							</div>
+							<h:outputLabel id="sbmtCategoryMsg" value="#{dashboardBean.message}"></h:outputLabel>
 							</h:form>
-							<br />
-		
-							<h:panelGroup id="addPetFormPanel">
-								<h:panelGroup rendered="#{dashboardBean.showAddPet}">
-			
-									<h:outputLabel for="petName">Enter pet name: </h:outputLabel>
-									<h:inputText id="petName" required="true"
-										requiredMessage="Required"
-										validator="#{dashboardBean.petNameValidator}" resetInput="true"></h:inputText>
-									<h:message for="petName" />
-									<br />
-			
-									<h:outputLabel for="petGender">Choose pet gender: </h:outputLabel>
-									<h:selectOneMenu value="#{dashboardBean.petGender}"
-										resetInput="true">
-										<f:selectItems value="#{dashboardBean.gendersOptions}" />
-									</h:selectOneMenu>
-									<br />
-			
-									<h:outputLabel for="petCategory">Choose pet category: </h:outputLabel>
-									<h:selectOneMenu id="petCategory"
-										value="#{dashboardBean.petCategory}" resetInput="true">
-										<f:selectItems value="#{dashboardBean.categoriesOptions}" />
-									</h:selectOneMenu>
-									<br />
-			
-									<h:outputLabel for="petAge">Enter pet age: </h:outputLabel>
-									<h:selectOneMenu id="petAge" value="#{dashboardBean.petAge}"
-										resetInput="true">
-										<f:selectItems value="#{dashboardBean.sizeOptions}" />
-									</h:selectOneMenu>
-									<br />
-			
-									<h:outputLabel for="petHeight">Enter pet height: </h:outputLabel>
-									<h:selectOneMenu id="petHeight" value="#{dashboardBean.petHeight}"
-										resetInput="true">
-										<f:selectItems value="#{dashboardBean.sizeOptions}" />
-									</h:selectOneMenu>
-									<br />
-			
-									<h:outputLabel for="petWeight">Enter pet weight: </h:outputLabel>
-									<h:selectOneMenu id="petWeight" value="#{dashboardBean.petWeight}"
-										resetInput="true">
-										<f:selectItems value="#{dashboardBean.sizeOptions}" />
-									</h:selectOneMenu>
-									<br />
-			
-									<h:outputLabel for="petLength">Enter pet length: </h:outputLabel>
-									<h:selectOneMenu id="petLength" value="#{dashboardBean.petLength}"
-										resetInput="true">
-										<f:selectItems value="#{dashboardBean.sizeOptions}" />
-									</h:selectOneMenu>
-									<br />
-			
-									<h:outputLabel for="petShortDesc">Enter short description of the pet: </h:outputLabel>
-									<h:inputTextarea id="petShortDesc"
-										value="#{dashboardBean.shortDescription}" required="true"
-										requiredMessage="Required" resetInput="true"></h:inputTextarea>
-			
-									<br />
-			
-									<h:outputLabel for="petFullDesc">Enter full description of the pet: </h:outputLabel>
-									<h:inputTextarea id="petFullDesc"
-										value="#{dashboardBean.fullDescription}" required="true"
-										requiredMessage="Required" resetInput="true"></h:inputTextarea>
-			
-									<br />
-			
-									<h:outputLabel for="petPhoto">Choose photo of the pet: </h:outputLabel>
-									<h:inputFile id="petPhoto" value="#{dashboardBean.petPhoto}"
-										required="true"></h:inputFile>
-			
-									<br />
-									
-									
-									<br/>
-									<h:commandButton id="submitPet" value="Submit"
-										action="#{dashboardBean.addNewPet}">
-										<f:resetValues render="addPetForm:petName" />
-									</h:commandButton>
-								</h:panelGroup>
 							</h:panelGroup>
 							<br/>
-							<h:panelGroup id="addViewRequestsFormPanel">
-								<h:panelGroup rendered="#{dashboardBean.showViewRequests}">
-									<ui:repeat value="#{dashboardBean.adoptionRequests}" var="adoptionRequest">
-										<div style="flex: 0 0 33.33%; padding: 10px; border: 1px solid black">
-									        <b>Pet Name:</b> #{adoptionRequest.petName}<br /> 
-							                <p>Requester Name: #{adoptionRequest.requesterName}</p>
-									        <p>Requester Address: #{adoptionRequest.requesterAddress}</p>
-									        <p>Requester Phone: #{adoptionRequest.requesterPhone}</p>
-									        <p>Request Message: #{adoptionRequest.requestMessage}</p>
-									    </div>
-									</ui:repeat>
-							        <h:outputLabel value="No adoption requests found" rendered="#{empty dashboardBean.adoptionRequests}" />
-								</h:panelGroup>
-							</h:panelGroup>
-							<h:panelGroup id="addViewSentRequestsFormPanel">
-								<h:panelGroup rendered="#{dashboardBean.showViewSentRequests}">
-									<ui:repeat value="#{dashboardBean.sentRequests}" var="sentRequest">
-										<div style="flex: 0 0 33.33%; padding: 10px; border: 1px solid black">
-									        <b>Pet Name:</b> #{sentRequest.petName}<br /> 
-							                <p>Owner Name: #{sentRequest.ownerName}</p>
-									        <p>Owner Address: #{sentRequest.ownerAddress}</p>
-									        <p>Owner Phone: #{sentRequest.ownerPhone}</p>
-									        <p>Your Message: #{sentRequest.requestMessage}</p>
-									    </div>
-									</ui:repeat>
-							        <h:outputLabel value="You did'nt make adoption requests" rendered="#{empty dashboardBean.sentRequests}" />
-								</h:panelGroup>
-							</h:panelGroup>
-						</h:form>
-					</td>
-					<td>
-						<h:form enctype="multipart/form-data"
-								style="display: flex; flex-wrap: wrap;">
-								<ui:repeat value="#{dashboardBean.petsList}" var="pet">
-									<div style="flex: 0 0 33.33%; padding: 10px; border: 1px solid black">
-										<b>Name:</b> #{pet.name}<br /> 
-										<b>Age:</b> #{pet.age}<br /> 
-										<b>Gender:</b>#{pet.genderString}<br /> 
-										<b>Weight:</b> #{pet.weight}<br /> 
-										<b>Height:</b>#{pet.height}<br /> 
-										<b>Length:</b> #{pet.length}<br /> 
-										<b>Short Description:</b> #{pet.shortDescription}<br /> 
-										<b>Full Description:</b> #{pet.fullDescription}<br /> 
-										<b>Photo:</b>#{pet.photo}<br />
-										
-										<h:graphicImage library="images" name="#{pet.photo}"  alt="Refresh the page if the photo isnt loading" style="width: 100px; height:100px;"/>
-										
-										<br />
-										<h:commandButton value="Remove pet"
-											action="#{dashboardBean.removePet}">
-											<f:param name="petName" value="#{pet.name}" />
-										</h:commandButton>
-									</div>
-								</ui:repeat>
-							</h:form>
-					</td>
+							<h:outputLabel for="petCategory">Choose pet category: </h:outputLabel>
+							<h:selectOneMenu id="petCategory" value="#{dashboardBean.petCategory}" resetInput="true" required="true" requiredMessage="Required">
+								<f:selectItem itemLabel="" itemValue="" />
+								<f:selectItems value="#{dashboardBean.categoriesOptions}" />
+							</h:selectOneMenu>
+							<h:message for="petCategory"></h:message>
+							<br />
 	
-			</tr>
-		</table>
-
+							<h:outputLabel for="petAge">Enter pet age: </h:outputLabel>
+							<h:selectOneMenu id="petAge" value="#{dashboardBean.petAge}" resetInput="true" required="true" requiredMessage="Required">
+								<f:selectItem itemLabel="" itemValue="" />
+								<f:selectItems value="#{dashboardBean.sizeOptions}" />
+							</h:selectOneMenu>
+							<h:message for="petAge"></h:message>
+							<br />
+	
+							<h:outputLabel for="petHeight">Enter pet height: </h:outputLabel>
+							<h:selectOneMenu id="petHeight" value="#{dashboardBean.petHeight}" resetInput="true" required="true" requiredMessage="Required">
+								<f:selectItem itemLabel="" itemValue="" />
+								<f:selectItems value="#{dashboardBean.sizeOptions}" />
+							</h:selectOneMenu>
+							<h:message for="petHeight"></h:message>
+							<br />
+	
+							<h:outputLabel for="petWeight">Enter pet weight: </h:outputLabel>
+							<h:selectOneMenu id="petWeight" value="#{dashboardBean.petWeight}" resetInput="true" required="true" requiredMessage="Required">
+								<f:selectItem itemLabel="" itemValue="" />
+								<f:selectItems value="#{dashboardBean.sizeOptions}" />
+							</h:selectOneMenu>
+							<h:message for="petWeight"></h:message>
+							<br />
+	
+							<h:outputLabel for="petLength">Enter pet length: </h:outputLabel>
+							<h:selectOneMenu id="petLength" value="#{dashboardBean.petLength}" resetInput="true" required="true" requiredMessage="Required">
+								<f:selectItem itemLabel="" itemValue="" />
+								<f:selectItems value="#{dashboardBean.sizeOptions}" />
+							</h:selectOneMenu>
+							<h:message for="petLength"></h:message>
+							<br />
+	
+							<h:outputLabel for="petShortDesc">Enter short description of the pet: </h:outputLabel>
+							<h:inputTextarea id="petShortDesc" value="#{dashboardBean.shortDescription}" required="true" 
+								requiredMessage="Required" resetInput="true"></h:inputTextarea>
+							<h:message for="petShortDesc"></h:message>
+	
+							<br />
+	
+							<h:outputLabel for="petFullDesc">Enter full description of the pet: </h:outputLabel>
+							<h:inputTextarea id="petFullDesc" value="#{dashboardBean.fullDescription}" required="true"
+								requiredMessage="Required" resetInput="true"></h:inputTextarea>
+							<h:message for="petFullDesc"></h:message>
+							<br />
+	
+							<h:outputLabel for="petPhoto">Choose photo of the pet: </h:outputLabel>
+							<h:inputFile id="petPhoto" value="#{dashboardBean.petPhoto}"
+								required="true"></h:inputFile>
+	
+							<br/>
+							
+							
+							<h:commandButton id="submitPet" value="Submit" action="#{dashboardBean.addNewPet}" styleClass="commandButton">
+								<f:ajax execute="@this petSubmittionPanel addPetFormPanel" render="addPetForm petSubmittionPanel addPetFormPanel"></f:ajax>
+								<f:resetValues render="addPetForm:petName" />
+							</h:commandButton>
+							
+						</h:panelGroup>
+					</h:panelGroup>
+					</div>
+					<br/>
+					<div id="addViewRequestsFormPanel" class="panel">
+					<h:panelGroup id="addViewRequestsFormPanel">
+						<h:panelGroup rendered="#{dashboardBean.showViewRequests}">
+							<h1>Adoption Requests for You</h1>
+							<ui:repeat value="#{dashboardBean.adoptionRequests}" var="adoptionRequest">
+								<div class="inner-panel">
+							        <b>Pet Name:</b> #{adoptionRequest.petName}<br /> 
+					                <p>Requester Name: #{adoptionRequest.requesterName}</p>
+							        <p>Requester Address: #{adoptionRequest.requesterAddress}</p>
+							        <p>Requester Phone: #{adoptionRequest.requesterPhone}</p>
+							        <p>Request Message: #{adoptionRequest.requestMessage}</p>
+							    </div>
+							</ui:repeat>
+					        <h:outputLabel value="No adoption requests found" rendered="#{empty dashboardBean.adoptionRequests}" />
+						</h:panelGroup>
+					</h:panelGroup>
+					</div>
+					<div id="addViewSentRequestsFormPanel" class="panel">
+					<h:panelGroup id="addViewSentRequestsFormPanel">
+						<h:panelGroup rendered="#{dashboardBean.showViewSentRequests}">
+							<h1>Your Adoption Requests</h1>
+							<ui:repeat value="#{dashboardBean.sentRequests}" var="sentRequest">
+								<div class="inner-panel">
+							        <b>Pet Name:</b> #{sentRequest.petName}<br /> 
+					                <p>Owner Name: #{sentRequest.ownerName}</p>
+							        <p>Owner Address: #{sentRequest.ownerAddress}</p>
+							        <p>Owner Phone: #{sentRequest.ownerPhone}</p>
+							        <p>Your Message: #{sentRequest.requestMessage}</p>
+							        <h:commandButton value="Cancel request" action="#{dashboardBean.cancelSentAdoptionRequest}" styleClass="commandButton">
+							        	<f:param name="id" value="#{sentRequest.petId}"></f:param>
+							       </h:commandButton>
+							    </div>
+							</ui:repeat>
+					        <h:outputLabel value="You did'nt make adoption requests" rendered="#{empty dashboardBean.sentRequests}" />
+						</h:panelGroup>
+					</h:panelGroup>
+					</div>
+				</h:form>
+			</div>
+			<h:form class="pets-list" enctype="multipart/form-data">
+			    <h:panelGroup rendered="#{empty dashboardBean.petsList}">
+			        <p>No pets available.</p>
+			    </h:panelGroup>
+			    <ui:repeat value="#{dashboardBean.petsList}" var="pet">
+			        <h:panelGroup rendered="#{not empty pet}">
+			            <div class="pet-info">
+			                <b>Id:</b> #{pet.id}<br/><br/> 
+			                <b>Name:</b> #{pet.name}<br/><br/> 
+			                <b>Category:</b> #{pet.category}<br/><br/> 
+			                <b>Age:</b> #{pet.age}<br/><br/> 
+			                <b>Gender:</b> #{pet.genderString}<br/><br/> 
+			                <b>Weight:</b> #{pet.weight}<br/><br/> 
+			                <b>Height:</b> #{pet.height}<br/><br/> 
+			                <b>Length:</b> #{pet.length}<br/><br/> 
+			                <b>Short Description:</b> #{pet.shortDescription}<br/><br/> 
+			                <b>Full Description:</b> #{pet.fullDescription}<br/><br/> 
+			                <b>Photo:</b><br/><br/> 
+			                
+			                <h:graphicImage library="images" name="#{pet.photo}" alt="Refresh the page if the photo isn't loading" />
+			                
+			                <br />
+			                <h:commandButton value="Remove pet" action="#{dashboardBean.removePet}" styleClass="commandButton">
+			                    <f:param name="petId" value="#{pet.id}" />
+			                </h:commandButton>
+			            </div>
+			        </h:panelGroup>
+			        <h:panelGroup rendered="#{empty pet}">
+			            <div class="pet-info">
+			                <p>No information available for this pet.</p>
+			            </div>
+			        </h:panelGroup>
+			    </ui:repeat>
+			</h:form>
+		</div>
 	</h:body>
       
       

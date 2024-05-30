@@ -1,36 +1,55 @@
 package pet_store;
 
+import java.io.IOException;
+
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
-import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
-//import javax.faces.context.ExternalContext;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-//import javax.faces.context.Flash;
-//import javax.servlet.http.HttpSession;
 
-
-
+/**
+ * Managed Bean class for the login page index.xhtml backend
+ * @author Artiom Cooper
+ */
 @SuppressWarnings("deprecation")
 @ManagedBean
 @RequestScoped 
-//TODO: FIX LOGIN user session , one user logs in then another can't log in ..maybe add a log out ? 
 public class LoginBean {
 	private String email;
 	private String password;
-	private boolean isEmailValid = false;
-	private boolean isPasswordValid = false;
+	private boolean isEmailValid;
+	private boolean isPasswordValid;
 	private String loginMessage;
-	private boolean isLoginValid = false;
-	
-	
+	private boolean isLoginValid;
+	private SessionManager session;
 	private User user;
 	
-	public LoginBean() {
+	/**
+	 * JSF Constructor , sets variables and checks if user is logged in then redirects to dashboard.
+	 */
+	@PostConstruct
+	public void init() {
 		
+		session = new SessionManager();
+		if(session != null && session.isUserLoggedIn() && ((User)session.getAttribute("user") != null)) {
+				FacesContext context = FacesContext.getCurrentInstance();
+				ExternalContext externalContext = context.getExternalContext();
+				try {
+					externalContext.redirect(externalContext.getRequestContextPath() + "/dashboard.xhtml");
+				} catch (IOException e) {
+					
+					e.printStackTrace();
+				}
+			}
+		isEmailValid = false;
+		isPasswordValid = false;
+		isLoginValid = false;
 	}
 	
+	//Getters & Setters
 	public boolean getIsLoginValid() {
 		return isLoginValid;
 	}
@@ -46,8 +65,6 @@ public class LoginBean {
 	public void setLoginMessage(String loginMessage) {
 		this.loginMessage = loginMessage;
 	}
-
-	
 
 	public String getEmail() {
 		return email;
@@ -65,6 +82,16 @@ public class LoginBean {
 		this.password = password;
 	}
 	
+	public boolean getIsEmailValid() {
+		return isEmailValid;
+	}
+
+	public boolean getIsPasswordValid() {
+		return isPasswordValid;
+	}
+	//End of Getters and Setters 
+	
+	//Field Validators
 	public void validateEmail(FacesContext context, UIComponent comp, Object val) {
 		String email = (String)val;
 		FacesMessage message;
@@ -76,10 +103,10 @@ public class LoginBean {
 		
 		
 		else {
-			System.out.println("email ok");
+			session.logger.info("Email address:" +email+" PASSED validation");
 			isEmailValid = true;
 			message = new FacesMessage("");
-			this.email = email;
+			this.email = email.toLowerCase();
 		}
 		context.addMessage(comp.getClientId(context), message);
 		
@@ -100,55 +127,46 @@ public class LoginBean {
 		context.addMessage(comp.getClientId(context), message);
 	}
 
-	public boolean getIsEmailValid() {
-		return isEmailValid;
-	}
 
-	public boolean getIsPasswordValid() {
-		return isPasswordValid;
-	}
 	
 	public String validateLogin() {
-
+		
 		if(User.checkUserEmailExists(email) && User.authenticatePassword(password, email)) {
 			setIsLoginValid(true);
 			setLoginMessage("");
-			System.out.println("Login successful");
+			session.logger.info("User "+email+" logged in succesfully");
 			user = User.getUser(email);
-			System.out.println("Test get user : id : "+ user.getId());
-			SessionManager.setAttribute("user", user);//TODO: FIX login set attribute 
+			session.logger.info("User ID: " + user.getId());
+			session.logger.info("Setting session attribute user");
+			
+			session.setAttribute("user", user); 
+			session.logger.info("Redirecting "+user.getFirstName()+" to dashboard.xhtml");
 			return "dashboard.xhtml?faces-redirect=true";
 			
 		}
 		else {
-			
-	        
 			setLoginMessage("Invalid Login details");
 			setIsLoginValid(false);
-			System.out.println("Login failed");
-			user = null;
-			return "";
+			session.logger.warning("Login failed");
 		}
-		
+		return "";
 	}
 	
-	public void invalidateSession() {
-		System.out.println("invalidating session");
-		SessionManager.invalidateSession();
-	}
-	
-	public boolean getCheckSession() {
+	/**
+	 * Backend for the Continue as Guest button , will redirect to a list of pets with limited options.
+	 * If the user was logged in will logout and end session
+	 * @return The redirect path
+	 */
+	public String continueAsGuest() {
 		try {
-			boolean testSess = (boolean)SessionManager.getAttribute("isUserLoggedIn");
-			System.out.println("testing session : " + testSess);
-			return true;
+			if(session.isUserLoggedIn()) {
+				session.invalidateSession();
+				return "view_pets.xhtml?faces-redirect=true";
+			}
+			
 		} catch (Exception e) {
-			System.out.println("Exception -> " + e);
-			return false;
+			System.err.println("Exception in continueAsGuest() ->" + e);
 		}
-		
+		return "view_pets.xhtml?faces-redirect=true";
 	}
-	
-	
-	
 }

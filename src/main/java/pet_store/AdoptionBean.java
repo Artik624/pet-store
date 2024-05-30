@@ -1,54 +1,92 @@
 package pet_store;
 
-import java.awt.event.ActionEvent;
+
+import java.io.IOException;
 
 //import java.util.ArrayList;
 //import java.util.List;
 //import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
+
 import javax.faces.bean.ManagedBean;
 //import javax.faces.bean.RequestScoped;
 //import javax.faces.bean.SessionScoped;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
 //import javax.faces.context.ExternalContext;
 //import javax.faces.context.FacesContext;
 //import javax.servlet.http.HttpSession;
 import javax.faces.context.FacesContext;
 
 
-
+/**
+ * Managed Bean class for the JSF FW. Manages the request_adoption.xhtml backend
+ * @author Artiom Cooper
+ */
 @SuppressWarnings("deprecation")
 @ManagedBean
 @ViewScoped
 public class AdoptionBean {
-	//private FacesContext facesContext = FacesContext.getCurrentInstance();
-	//private ExternalContext externalContext = facesContext.getExternalContext();
+	private FacesContext facesContext;
+	private ExternalContext externalContext;
 	private static DbManager dbLink = DbManager.getDbManagerInstance();
-	
+	private SessionManager session;
 	private String petID;
-	private String adoptionMessage = "Send message to owner";
+	private String adoptionMessage ;
 	private String adoptionRequestResponse = "";
 	private User user;
-	
-	public String getAdoptionRequestResponse() {
-		return adoptionRequestResponse;
-	}
-
-	public void setAdoptionRequestResponse(String adoptionRequestResponse) {
-		this.adoptionRequestResponse = adoptionRequestResponse;
-	}
-
 	private Pet pet;
 	private User owner;
 	
+
+	/**
+	 * Constructor for the Bean, instantiates variables and checks if a session and a user is logged in.
+	 * If no user is found, redirects the user to the main page.
+	 */
 	@PostConstruct
 	public void init() {
-		petID = (String)SessionManager.getAttribute("petId");
-		user = (User)SessionManager.getAttribute("user");
+		adoptionMessage = "Send message to owner";
+		session = new SessionManager();
+		facesContext = session.getFacesContext();
+		externalContext = session.getExternalContext();
+		if(session != null) {
+			System.out.println("Session detected ");
+			user = (User)session.getAttribute("user");
+			petID = (String)session.getAttribute("petId");
+			if(user != null) {
+				System.out.println("User detected: " +user.getFirstName()+", "+user.getLastName());
+				getPetDetails(petID);
+				getOwnerDetails(petID);
+				
+			}
+			else {
+				System.out.println("User is null in dashbnoard");
+				try {
+					externalContext.redirect(externalContext.getRequestContextPath() + "/index.xhtml");
+					
+				} catch (Exception e) {
+					System.out.println("Exception in Dashboard init()-> " + e);
+				}			
+			}
+		}
+		else {
+			System.out.println("No SESSION FOUND");			
+		}
+		petID = (String)session.getAttribute("petId");
+		user = (User)session.getAttribute("user");
 		getPetDetails(petID);
 		getOwnerDetails(petID);
+	}
+	
+	//Getters & Setters
+	public String getAdoptionRequestResponse() {
+		return adoptionRequestResponse;
+	}
+	
+	public void setAdoptionRequestResponse(String adoptionRequestResponse) {
+		
+		this.adoptionRequestResponse = adoptionRequestResponse;
 	}
 	
 	public String getAdoptionMessage() {
@@ -76,56 +114,72 @@ public class AdoptionBean {
 	public User getOwner() {
 		return owner;
 	}
+	//End of Getters & Setters
 	
+	/**
+	 * Retrieve pet details from DB by pet Id and set as class variable.
+	 * @param petId -- Pet id to get from DB
+	 */
 	private void getPetDetails(String petId) {
-		System.out.println("Geting Pet Details");
 		try {
 			pet = dbLink.getPetByID(petId);
-			System.out.println("pet name : " + pet.getName());
 		} catch (NullPointerException e) {
-			System.out.println(e + " in AdoptionBean.viewPet");
+			System.out.println("Exception in AdoptionBean.getPetDetails() -> " + e);
 		}
-		
 	}
 	
+	/**
+	 * Retrieve user details by pet ID and set as class variable.
+	 * @param petId -- the pet Id for which to get the user data
+	 */
 	private void getOwnerDetails(String petId) {
-		System.out.println("Geting Owner Details");
 		try {
 			owner = (dbLink.getOwnerByPetID(petId));
-			System.out.println("name : " + owner.getFirstName());
 			
 		} catch (NullPointerException e) {
-			System.out.println(e +" at vewOwner at AdoptionBean ");
+			System.out.println("Exception in AdoptionBean.getOwnerDetails()-> " + e);
 		}
-		
 	}
 	
-	public String sendAdoptionMessage() {
-		System.out.println("adoptionMessage :" + adoptionMessage);
-		if (!adoptionMessage.isBlank() && !adoptionMessage.equals("Send message to owner")) {
-			System.out.println("in condition");
+	/**
+	 * Send adoption request message to DB
+	 * Will check message content and if adoption request already exists.
+	 * And sets a message indicating the result of the action.
+	 */
+	public void sendAdoptionMessage() {
+		if (!adoptionMessage.isBlank() && !adoptionMessage.equals("Send message to owner") && !user.checkIfAdoptionReqeuested(petID)) {
 			try {
-				System.out.println("pet_id : " + pet.getId());
-				System.out.println("requester_id : " + user.getId());
-				System.out.println("owner_id : " + owner.getId());
-				System.out.println("message : " + adoptionMessage);
-				adoptionRequestResponse="Message Sent to owner";
-			    dbLink.sendAdoptionRequestToDB(petID, user.getId(), owner.getId(), adoptionMessage);
-				return "";
-				//return "view_pets.xhtml?faces-redirect=true";
+				if(dbLink.sendAdoptionRequestToDB(petID, user.getId(), owner.getId(), adoptionMessage))
+					adoptionRequestResponse="Message Sent to owner";
+				else
+					adoptionRequestResponse="Error: failed to send message to owner";
 				
 			} catch (Exception e) {
 				System.out.println("Exception in sendAdoptionMessage() : -> " + e );
-				adoptionRequestResponse="ERROR: Message waas not sent ";
-				return "";
-				
+				adoptionRequestResponse="ERROR: Message was not sent ";
 			}
-		}else {
+		}
+		else if(user.checkIfAdoptionReqeuested(petID)) {
+			adoptionRequestResponse="ERROR: You already sent an adoption request for this pet ";
+		}
+		else {
 			adoptionRequestResponse="ERROR: Must send a message";
-			return "";
-			
 		}
 		
+	}
+	
+	/**
+	 * Helper method to redirect the user to main page index.xhtml
+	 */
+	public void redirectToIndex() {
+		try {
+        	facesContext = FacesContext.getCurrentInstance();
+    		externalContext = facesContext.getExternalContext();
+			externalContext.redirect(externalContext.getRequestContextPath() + "/index.xhtml");
+		} catch (IOException e) {
+			
+			System.out.println("Exception in redirectToIndex()-> " + e);
+		}
 	}
 
 }

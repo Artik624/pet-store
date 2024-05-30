@@ -2,11 +2,14 @@ package pet_store;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 
-
+/**
+ * Managed Bean class for the registration.xhtml backend.
+ * Used to create a user and authenticate the input values
+ * @author Artiom Cooper
+ */
 @SuppressWarnings("deprecation")
 @ManagedBean
 public class RegisterBean {
@@ -36,8 +39,10 @@ public class RegisterBean {
 	private boolean isStreetValid;
 	private boolean isStreetNumberValid;
 	
-	private String registerMessage = "xxxxx";
+	private String registerMessage = "";
 	
+	
+	//Getters & Setters
 	public String getRegisterMessage() {
 		return registerMessage;
 	}
@@ -121,9 +126,10 @@ public class RegisterBean {
 	public boolean getIsStreetNumberValid() {
 		return isStreetNumberValid;
 	}
+	//End of Getters & Setters
 	
-	public boolean test = true;
 	
+	//Validators will check the input values and will set a flag for each field
 	public void validateFirstName(FacesContext context, UIComponent comp, Object val)  {
 		String firstName = (String)val;
 		FacesMessage message;
@@ -201,7 +207,7 @@ public class RegisterBean {
 			if(!User.checkUserEmailExists(email)) {
 				isEmailValid = true;
 				message = new FacesMessage("OK");
-				this.email = email;
+				this.email = email.toLowerCase();
 				
 			}
 			else {
@@ -215,9 +221,9 @@ public class RegisterBean {
 	public void validatePhone(FacesContext context, UIComponent comp, Object val) {
 		String phone = (String)val;
 		FacesMessage message;
-		if(!phone.matches("^\\d{10}$")) {
+		if(!phone.matches("\\d{7,10}")) {
 			isPhoneValid = false;
-			message = new FacesMessage("Invalid phone number, must contain up to 10 numbers");
+			message = new FacesMessage("Invalid phone number, must contain between 7 to 10 numbers");
 		}
 		else {
 			isPhoneValid = true;
@@ -275,7 +281,10 @@ public class RegisterBean {
 	
 	}
 
-	
+	/**
+	 * If all flags are true will create a user object with the provided details
+	 * @return path to redirect user to index or null 
+	 */
 	public String createUser() {
 		if(isFirstNameValid && isLastNameValid && isPasswordValid && isEmailValid && isPhoneValid && isCityValid && isStreetValid & isStreetNumberValid) {
 			System.out.println("Registering User");
@@ -294,9 +303,6 @@ public class RegisterBean {
 			} catch (Exception e) {
 				setRegisterMessage(e.toString());
 			}
-				
-			
-			
 		}
 		return null;
 	}

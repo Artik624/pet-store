@@ -1,7 +1,12 @@
 package pet_store;
 
+/**
+ * A wrapper class to retrieve adoption requests by User or for User
+ * @author Artiom Cooper
+ */
 public class AdoptionRequestWrapper {
     private String petName;
+    private String petId;
     private String requesterName;
     private String requesterAddress;
     private int requesterPhone;
@@ -12,7 +17,14 @@ public class AdoptionRequestWrapper {
     
     
     
-    
+    /**
+     * Constructor for requester by user
+     * @param petName
+     * @param requesterName
+     * @param requesterAddress
+     * @param requesterPhone
+     * @param requestMessage
+     */
 	public AdoptionRequestWrapper(String petName, String requesterName, String requesterAddress, int requesterPhone, String requestMessage) {
 		this.petName = petName;
 		this.requesterName = requesterName;
@@ -20,15 +32,32 @@ public class AdoptionRequestWrapper {
 		this.requesterPhone = requesterPhone;
 		this.requestMessage = requestMessage;
 	}
-	public AdoptionRequestWrapper(String petName, String ownerName, int ownerPhone, String ownerAddress, String requestMessage) {
+	
+	/**
+	 * Constructor for requests for user
+	 * @param petName
+	 * @param ownerName
+	 * @param ownerPhone
+	 * @param ownerAddress
+	 * @param requestMessage
+	 * @param pet_id
+	 */
+	public AdoptionRequestWrapper(String petName, String ownerName, int ownerPhone, String ownerAddress, String requestMessage, String pet_id) {
 		this.petName = petName;
 		this.ownerName = ownerName;
 		this.ownerAddress = ownerAddress;
 		this.ownerPhone = ownerPhone;
 		this.requestMessage = requestMessage;
+		this.petId = pet_id;
 	}
 	
-	
+	//Getter & Setters
+	public String getPetId() {
+		return petId;
+	}
+	public void setPetId(String petId) {
+		this.petId = petId;
+	}
 	public String getPetName() {
 		return petName;
 	}

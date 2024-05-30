@@ -4,79 +4,61 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:p="http://primefaces.org/ui">
-<head>
+<h:head>
 	<meta charset="ISO-8859-1"></meta>
-	<title>Insert title here</title>
-</head>
+	 <h:outputStylesheet library="css" name="adoption.css"/>
+	<title>Adoption dash</title>
+</h:head>
 <h:body>
-	
+    <div class="grid-container">
+        
+            <h:form class="logout-section">
+                <h:commandButton value="Logout" action="#{dashboardBean.logout}" styleClass="commandButton"/>
+                <input type="button" value="Back" onclick="window.history.back();" class="commandButton"/>
+            </h:form>
+       
 
-	<table>
-		<tr>
-			<td>
-				<h:form>
-					<h:commandButton value="Logout" action="#{dashboardBean.logout}"></h:commandButton>
-					<input type="button" value="Back" onclick="window.history.back();" />
-					
-				</h:form>
-				
-			</td>
-		</tr>
-		<tr>
-			<td>
-				
-				<h:form id="petForm" enctype="multipart/form-data"  style="display: flex; flex-wrap: wrap;">
-					
-					<div style="flex; padding: 10px; border: 1px solid black">
-               			<h:outputText value = "Name: #{adoptionBean.pet.name}"/><br/>
-		            	<h:outputText value="Age: #{adoptionBean.pet.age}" /><br/>
-		            	<h:outputText value="Category: #{adoptionBean.pet.category}" /><br/>
-		            	<h:outputText value="Gender: #{adoptionBean.pet.genderString}" /><br/>
-		            	<h:outputText value="Weight: #{adoptionBean.pet.weight}" /><br/>
-		            	<h:outputText value="Height #{adoptionBean.pet.height}" /><br/>
-		            	<h:outputText value="Length: #{adoptionBean.pet.length}" /><br/>
-		            	<h:outputText value="Short Description: #{adoptionBean.pet.fullDescription}" /><br/>
-		            	<h:outputText value="Full Description: #{adoptionBean.pet.shortDescription}" /><br/>
-						<h:graphicImage library="images" name="#{adoptionBean.pet.photo}" style="width: 300px; height:300px;"/><br/>
-						
-					</div>
-					<div style="flex; padding: 10px; border: 1px solid black">
-               			<h:outputText value = "Name: #{adoptionBean.owner.firstName}, #{owner.lastName}"/><br/>
-               			<h:outputText value = "Email: #{adoptionBean.owner.email}"/><br/>
-               			<h:outputText value = "Phone: #{adoptionBean.owner.phone}"/><br/>
-               			<h:outputText value = "Address: #{adoptionBean.owner.city}, #{adoptionBean.owner.street} #{adoptionBean.owner.streetNumber}"/>
-               			<br/>
-						
-					</div>
-					<br/>
-					
-					
-				</h:form>
-			</td>
-			<td>
-				
-			        <h:form>
-			        	
-			        	<p:growl id="growl" showDetail="true" sticky="true"  /> 
-				        <h:inputTextarea value="#{adoptionBean.adoptionMessage}" />
-						<br/>
-						
-						<h:commandButton value="Send Message" action="#{adoptionBean.sendAdoptionMessage}" /> 
-								
-						
-				        <br/>
-				        <h:outputText id="test" value="#{adoptionBean.adoptionRequestResponse}"></h:outputText>
-			        	
-			        </h:form>
-			</td>
-			
-			
-		
-		</tr>
-	
-	</table>
-			        
-			       
-	
+        
+            <h:form class="pet-details-section" id="petForm" enctype="multipart/form-data">
+                <!-- Pet Information -->
+                <div class="pet-info">
+                	<h1>Pet Details</h1><br/>
+                    <h:outputText value="Id: #{adoptionBean.pet.id}" /><br/><br/>
+                    <h:outputText value="Name: #{adoptionBean.pet.name}" /><br/><br/>
+                    <h:outputText value="Age: #{adoptionBean.pet.age}" /><br/><br/>
+                    <h:outputText value="Category: #{adoptionBean.pet.category}" /><br/><br/>
+                    <h:outputText value="Gender: #{adoptionBean.pet.genderString}" /><br/><br/>
+                    <h:outputText value="Weight: #{adoptionBean.pet.weight}" /><br/><br/>
+                    <h:outputText value="Height: #{adoptionBean.pet.height}" /><br/><br/>
+                    <h:outputText value="Length: #{adoptionBean.pet.length}" /><br/><br/>
+                    <h:outputText value="Short Description: #{adoptionBean.pet.shortDescription}" /><br/><br/>
+                    <h:outputText value="Full Description: #{adoptionBean.pet.fullDescription}" /><br/><br/>
+                    <!-- Add other pet details here -->
+                    <h:graphicImage library="images" name="#{adoptionBean.pet.photo}" style="width: 300px; height: 300px;" /><br/>
+                </div>
+
+                <!-- Owner Information -->
+                <div class="owner-info">
+                	<h1>Owner Details</h1><br/>
+                    <h:outputText value="Name: #{adoptionBean.owner.firstName}, #{adoptionBean.owner.lastName}" /><br/><br/>
+                    <h:outputText value="Email: #{adoptionBean.owner.email}" /><br /><br/>
+                    <h:outputText value="Phone: #{adoptionBean.owner.phone}" /><br /><br/>
+                    <h:outputText value="Address: #{adoptionBean.owner.city}, #{adoptionBean.owner.street} #{adoptionBean.owner.streetNumber}" /><br /><br/>
+                </div>
+
+                <!-- Message Form -->
+                <div class="message-form">
+                	<h1>Request to Adopt</h1>
+                   
+                    <h:inputTextarea id="adoptionMsg" value="#{adoptionBean.adoptionMessage}" /><br />
+                    <h:commandButton id="sndMsgBtn" value="Send Message" action="#{adoptionBean.sendAdoptionMessage}" styleClass="commandButton">
+                        <f:ajax execute="@this adoptionMsg" render="result" />
+                        
+                    </h:commandButton><br />
+                    <h:outputLabel id="result" value="#{adoptionBean.adoptionRequestResponse}" />
+                </div>
+            </h:form>
+        </div>
+    
 </h:body>
 </html>

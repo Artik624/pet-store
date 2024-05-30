@@ -6,44 +6,32 @@
 
     <h:head>
         <title>Pet-Store</title>
-        <link rel="stylesheet" type="text/css" href="style.css" />
+        <h:outputStylesheet library="css" name="index.css"/>
 
     </h:head>
 
     <h:body>
-        <h1>Welcome</h1>
-
+       <div class="content">
+        <h1>Welcome to Pet-Store</h1>
         <h:form id="loginForm">
-        	<h:outputLabel>Sign in</h:outputLabel>
-        	<br/>
-            <h:outputLabel for="email">Enter Your Email: </h:outputLabel>
-            <h:inputText id="email" required="true" validator="#{loginBean.validateEmail}" requiredMessage="Required"/>
-            <h:message id="emailMessage" for="email" styleClass="#{loginBean.isEmailValid ? 'validMessage' : 'invalidMessage'}"/>
-            	
-            
-            <br/>
-            <h:outputLabel for="password">Enter Your Password: </h:outputLabel>
-			<h:inputSecret id="password" required="true" value="#{loginBean.password}" requiredMessage="Required" />
-			<h:message for="password" styleClass="#{loginBean.isPasswordValid ? 'validMessage' : 'invalidMessage'}"/>
-				
-			
-            <br/>
-
-            <h:commandButton id="loginBtn" value="Login" action="#{loginBean.validateLogin}" > <f:resetValues render="loginForm:email"/></h:commandButton>
-            <br/>
-            <h:outputLabel value="#{loginBean.loginMessage}" styleClass="#{loginBean.isLoginValid ? 'validMessage' : 'invalidMessage'}"></h:outputLabel>
-            <h:message for="loginBtn" styleClass="loginBean.isLoginValid ? 'validMessage' : 'invalidMessage'}"/>
-            
+            <label for="email">Enter email</label>
+            <h:inputText id="email" required="true" validator="#{loginBean.validateEmail}" requiredMessage="Required" />
+            <h:message id="emailMessage" for="email" styleClass="#{loginBean.isEmailValid ? 'validMessage' : 'invalidMessage'}" />
+            <label for="password">Enter password</label>
+            <h:inputSecret id="password" required="true" value="#{loginBean.password}" requiredMessage="Required" />
+            <h:message for="password" styleClass="#{loginBean.isPasswordValid ? 'validMessage' : 'invalidMessage'}" />
+            <h:commandButton id="loginBtn" value="Login" action="#{loginBean.validateLogin}" styleClass="commandButton">
+                <f:resetValues render="loginForm:email" />
+            </h:commandButton>
+            <h:outputLabel value="#{loginBean.loginMessage}" styleClass="#{loginBean.isLoginValid ? 'validMessage' : 'invalidMessage'}" />
+            <h:message for="loginBtn" styleClass="loginBean.isLoginValid ? 'validMessage' : 'invalidMessage'}" />
         </h:form>
         <h:form>
-        	<br/>
-        	<h:outputLabel>Not a member? Register or Continue as quest</h:outputLabel>
-        	<br/>
-			<h:commandButton value="Register" action="register.xhtml?faces-redirect=true" />
-			<br/>
-			<h:commandButton value="Continue as guest" action="view_pets.xhtml?faces-redirect=true" />
-            
+            <h:outputLabel>Not a member? Register or Continue as guest</h:outputLabel>
+            <h:commandButton value="Register" action="register.xhtml?faces-redirect=true" styleClass="commandButton" />
+            <h:commandButton value="Continue as guest" action="#{loginBean.continueAsGuest}" styleClass="commandButton" />
         </h:form>
+    </div>
         
        
     </h:body>

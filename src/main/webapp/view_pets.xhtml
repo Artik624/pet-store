@@ -4,101 +4,130 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
       
-      <h:head>
-      
-      
-      </h:head>
-      <h:body>
-	      
-	      	<table style="border: 1px solid black">
-			<tr>
-				<td>
-					<h:panelGroup rendered="#{petsBean.isUser}">
-					<h:form>
-						<h:commandButton value="Logout" action="#{dashboardBean.logout}"></h:commandButton> <br/>
-					</h:form>
-					</h:panelGroup>
-					<f:event type="preRenderView" listener="#{petsBean.checkSession()}" />
-				</td>
-			</tr>
-			<tr style="">
-				<td style="padding: 10px; ">
-					<h:form>
-						<input type="button" value="Back" onclick="window.history.back();" />
-					    <h:selectOneRadio value="#{petsBean.selectCategory}">
-					        <f:selectItems value="#{petsBean.petCategories}" />
-					        <f:selectItem itemValue=" " itemLabel="All" />
-					        <f:ajax render="allPets" />
-					    </h:selectOneRadio>
-					
-					</h:form>
-					<h:form id="allPets" enctype="multipart/form-data">
-						<ui:repeat id="petsTable" value="#{petsBean.allPets}" var="pet" >
-							<h:panelGroup rendered="#{petsBean.selectCategory eq ' ' or pet.category eq petsBean.selectCategory}">
-							<div style="border: 1px solid black">
-		               			<h:outputText value = "Name: #{pet.name}"/><br/>
-				            	<h:outputText value="Age: #{pet.age}" /><br/>
-				            	<h:outputText value="Category: #{pet.category}" /><br/>
-				            	<h:outputText value="Short Description: #{pet.shortDescription}" /><br/>
-								<h:graphicImage library="images" name="#{pet.photo}" style="width: 100px; height:100px;"/><br/>
-			            	  	<h:commandButton value="View Pet" action="#{petsBean.viewPet}" >
-			            			<f:param name="id" value="#{pet.id}" />	
-			            			
-			            		</h:commandButton>
+<h:head>
+	<title>Pet Store</title>
+	<h:outputStylesheet library="css" name="view-pets.css"/>
+
+</h:head>
+
+<h:body>
+	
+    <h:form id="main">
+        <!-- Logout and back buttons -->
+        
+        <!-- Filters -->
+        <div  class="top-container">
+	        <div class="navigation">
+	            <h:panelGroup rendered="#{petsBean.isUser}">
+	                <h:form>
+	                    <h:commandButton value="Logout" action="#{dashboardBean.logout}" styleClass="commandButton"></h:commandButton>
+	                </h:form>
+	            </h:panelGroup>
+	            <input type="button" value="Back" onclick="window.history.back();" class="commandButton" />
+	        </div>
+	        <div class="filters">
+	            <h:form >
+				    <div class="filter-group">
+				        <h:outputLabel value="Pet Category: " styleClass="text"></h:outputLabel>
+				        <h:selectOneMenu value="#{petsBean.selectCategory}">
+				            <f:selectItem itemValue=" " itemLabel="All" />
+				            <f:selectItems value="#{petsBean.petCategories}" />
+				            <f:ajax execute="@form" render="main:allPets"></f:ajax>
+				        </h:selectOneMenu>
+				    </div>
+				    <div class="filter-group">
+				        <h:outputLabel value="Pet Gender: " styleClass="text"></h:outputLabel>
+				        <h:selectOneRadio value="#{petsBean.selectGender}">
+				            <f:selectItem itemValue=" " itemLabel="All" />
+				            <f:selectItem itemValue="male" itemLabel="Male" />
+				            <f:selectItem itemValue="female" itemLabel="Female" />
+				            <f:ajax execute="@form" render="main:allPets"></f:ajax>
+				        </h:selectOneRadio>
+				    </div>
+				    <div class="filter-group">
+				        <h:outputLabel value="Pet Age " styleClass="text"></h:outputLabel>
+				        <h:selectOneRadio value="#{petsBean.selectAgeCategory}">
+				            <f:selectItem itemValue=" " itemLabel="All"  />
+				            <f:selectItem itemValue="Young" itemLabel="Young (0-1)" />
+				            <f:selectItem itemValue="Adult" itemLabel="Adult (2+)" />
+				            <f:ajax execute="@form" render="main:allPets"></f:ajax>
+				        </h:selectOneRadio>
+				    </div>
+				</h:form>
+	        </div>
+        </div>
+
+        <!-- Pet cards -->
+       	<div class="pet-cards-container">
+        <h:form id="allPets" enctype="multipart/form-data">
+           		<div class="all-pets">
+	                <ui:repeat id="petsTable" value="#{petsBean.allPets}" var="pet" >
+	                        <!-- Pet Card -->
+	                    <h:panelGroup  rendered="#{(petsBean.selectCategory eq ' ' or pet.category eq petsBean.selectCategory) and 
+		                                        (petsBean.selectGender eq ' ' or pet.genderString eq petsBean.selectGender) and
+		                                        (petsBean.selectAgeCategory eq ' ' or 
+		                                        (petsBean.selectAgeCategory eq 'Young' and pet.age ge 0 and pet.age le 1) or
+		                                        (petsBean.selectAgeCategory eq 'Adult' and pet.age ge 2))}">
+                       		<div class="pet-card">
+		                            <div class="pet-info text">
+		                            <h:outputText value="Id: #{pet.id}"/><br/><br/>
+		                            <h:outputText value="Name: #{pet.name}"/><br/><br/>
+		                            <h:outputText value="Age: #{pet.age}" /><br/><br/>
+		                            <h:outputText value="Category: #{pet.category}" /><br/><br/>
+		                            <h:outputText value="Gender #{pet.genderString}" /><br/><br/>
+		                            <h:outputText value="Short Description: #{pet.shortDescription}" /><br/><br/>
+		                            </div>
+		                            <div class="pet-photo">
+		                            <h:graphicImage library="images" name="#{pet.photo}" /><br/>
+	                                <h:commandButton value="View Pet" action="#{petsBean.viewPet}" styleClass="commandButton">
+	                                    <f:param name="id" value="#{pet.id}" />	
+	                                    <f:ajax execute="@this main:view main:view:viewPetDetails" render="main:view main:view:viewPetDetails"></f:ajax>
+	                                </h:commandButton>
+		                            </div>
+               	 			</div>
+	                    </h:panelGroup>
+	                </ui:repeat>
+          			</div>
+	            </h:form>
+	            <h:form id="view" enctype="multipart/form-data">  
+           		 <div class="view-pet-card">
+						<h:panelGroup id="viewPetDetails" rendered="#{petsBean.showPet}" >
+							<div class="view-pet-card-content text">
+								<div><b>Name:</b> #{petsBean.viewedPet.name}</div>
+				                <div><b>Category:</b> #{petsBean.viewedPet.category}</div>
+				                <div><b>Age:</b> #{petsBean.viewedPet.age}</div>
+				                <div><b>Gender:</b> #{petsBean.viewedPet.genderString}</div>
+				                <div><b>Weight:</b> #{petsBean.viewedPet.weight}</div>
+				                <div><b>Height:</b> #{petsBean.viewedPet.height}</div>
+				                <div><b>Length:</b> #{petsBean.viewedPet.length}</div>
+				                <div><b>Short Description:</b> #{petsBean.viewedPet.shortDescription}</div>
+				                <div><b>Full Description:</b> #{petsBean.viewedPet.fullDescription}</div>
+								<div class="pet-photo-full">
+								<h:graphicImage  library="images" name="#{petsBean.viewedPet.photo}" alt="Refresh the page if image doesn't show"/>
+								 </div>
+								
 								<br/>
-							</div>
-						
-							</h:panelGroup>
-	           		 	</ui:repeat>
-	           		 	
-					</h:form>
-					</td>
-					<td >
-						<h:panelGroup id="viewPetDetails" rendered="#{petsBean.showPet}" value="#{petsBean.viewPet}" var="pet">
-							<h:form id="view" enctype="multipart/form-data" immediate="true" style="display: flex; flex-wrap: wrap;">  
-							 
-											<div style="flex: 0 0 60%; padding: 10px; border: 1px solid black">
-												<b>Name:</b> #{pet.name}<br /> 
-												<b>Category:</b> #{pet.category}<br /> 
-												<b>Age:</b> #{pet.age}<br /> 
-												<b>Gender:</b>#{pet.genderString}<br /> 
-												<b>Weight:</b> #{pet.weight}<br /> 
-												<b>Height:</b>#{pet.height}<br /> 
-												<b>Length:</b> #{pet.length}<br /> 
-												<b>Short Description:</b> #{pet.shortDescription}<br /> 
-												<b>Full Description:</b> #{pet.fullDescription}<br /> 
-												<h:graphicImage library="images" name="#{pet.photo}" style="width: 300px; height:300px;"/>
-												<br/>
-							            		<br/>
-												<!-- TODO : FIX THIS BUTTON SO IT RENDERS THE NEXT FORM  -->
-							            	  	<h:commandButton value="Close" action="#{petsBean.setShowPet}"/>
-											</div>
-										<br/>
-										
-							 
-							</h:form>
-							<h:panelGroup rendered="#{petsBean.isUser}">
-								<h:form id="test" enctype="multipart/form-data">
-									<h:commandButton value="Request Adoption" action="#{petsBean.requestAdoption}"  >
+			            	  	<h:commandButton value="Close" action="#{petsBean.setShowPet}" styleClass="commandButton">
+			            	  		<f:ajax render="main:view"></f:ajax>
+			            	  	</h:commandButton>
+			            	  	<h:panelGroup rendered="#{petsBean.isUser}">
+									<h:commandButton id="adoptBtn" value="Request Adoption" action="#{petsBean.requestAdoption}" styleClass="commandButton">
 										<f:param name="id" value="#{pet.id}" />
 										<f:ajax execute="@this" render="requestAdoptionMessage"></f:ajax>
 									</h:commandButton>
-									<br/>
-									<h:outputLabel id="requestAdoptionMessage" value="#{petsBean.message}"></h:outputLabel>
-								</h:form>
-							</h:panelGroup>
-								
-								 
-								
+								<h:outputLabel id="requestAdoptionMessage" value="#{petsBean.message}"></h:outputLabel>
+								</h:panelGroup>
+							</div>
 						</h:panelGroup>
-					</td>
-					
-	
-			</tr>
-		</table>
-		
-			
-      </h:body>
-      
-      
+            		</div>
+				</h:form>
+            
+        	</div>
+            	
+            
+        
+
+
+    </h:form>
+</h:body>
 </html>

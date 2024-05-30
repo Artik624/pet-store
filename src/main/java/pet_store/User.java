@@ -3,10 +3,12 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.List;
 import java.util.UUID;
-import javax.faces.bean.SessionScoped;
+import java.util.logging.Logger;
 
-
-@SuppressWarnings("deprecation")
+/**
+ * Represents the user object , mainly for getters and DB encapsulation
+ * @author Artiom Cooper
+ */
 public class User {
 	private String id;
 	private String firstName;
@@ -19,9 +21,21 @@ public class User {
 	private int streetNumber;
 	
 	private static DbManager dbLink = DbManager.getDbManagerInstance();
+	private Logger logger = Logger.getLogger(DbManager.class.getName());
 	
-	
-
+	/**
+	 * Constructor
+	 * @param id
+	 * @param firstName
+	 * @param lastName
+	 * @param password
+	 * @param email
+	 * @param phone
+	 * @param city
+	 * @param street
+	 * @param streetNumber
+	 * @throws Exception
+	 */
 	public User(String id,
 				String firstName, 
 				String lastName, 
@@ -33,7 +47,7 @@ public class User {
 				int streetNumber) throws Exception {
 		
 		
-		this.id = generateUUID();
+		this.id = generateUUID();//Generates a UUID for the user
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.password = password;
@@ -42,13 +56,12 @@ public class User {
 		this.city = city;
 		this.street = street;
 		this.streetNumber = streetNumber;
-		
 		this.password = User.getHashPassword(this.password);
+		logger.info("Creating new User");
 		if(this.password == "" || !this.password.startsWith("$2a$"))
 			throw new Exception("Error creating user");
 		
-		String s = String.format("User created with ID %s, name %s %s", id, firstName, lastName);
-		System.out.println(s);
+		logger.info(String.format("User created with ID %s, name %s %s", id, firstName, lastName));
 	}
 	
 	public User(String uuid,
@@ -70,12 +83,16 @@ public class User {
 		this.streetNumber = streetNumber;
 		
 	}
-	
+	/**
+	 * Generates a UUID
+	 * @return UUID
+	 */
 	protected static String generateUUID() {
 		UUID uuid = UUID.randomUUID();
 		return uuid.toString();
 	}
 
+	//Getters & Setters
 	public String getId() {
 		return id;
 	}
@@ -147,32 +164,46 @@ public class User {
 	public void setStreetNumber(int streetNumber) {
 		this.streetNumber = streetNumber;
 	}
+	//End of Getters & Setters
 	
+	/**
+	 * Sends User to DB class to insert into users table
+	 * @return true if operation was successful
+	 */
 	public boolean sendToDB() {
 		if (dbLink.insertUser(this) == 1) 
 			return true;
 		return false;
 	}
 	
-	
+	/**
+	 * Generates a hashed password with BCrypt
+	 * @param password
+	 * @return hashed password or empty String
+	 */
 	public static String getHashPassword(String password) {
-
 		String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 		if(password != null && hashedPassword != null)
 			return hashedPassword;
 		return "";
 	}
 	
+	/**
+	 * Checks if the provided password from the users authenticates with the hashed password
+	 * @param password
+	 * @param email
+	 * @return true if password match
+	 */
 	public static boolean authenticatePassword(String password, String email) {
-        
 		String hashedPassword = dbLink.getHashedPassword(email);
 		boolean result = BCrypt.checkpw(password, hashedPassword);
         return result;
 	}
 	
+	
+	//Wrapper methods to perform DB operations for the User
 	public static boolean checkUserEmailExists(String email) {
 		return dbLink.checkEmail(email);
-		
 	}
 	
 	public static User getUser(String email) {
@@ -180,7 +211,6 @@ public class User {
 	}
 	
 	public List<String> getPetCategories(){
-		//System.out.println("geting categories in User ");
 		return dbLink.getCategories();
 	}
 	
@@ -198,6 +228,16 @@ public class User {
 	
 	public boolean checkIfAdoptionReqeuested(String pet_id) {
 		return dbLink.isAdoptionRequestExists(pet_id, id);
+	}
+	
+	public boolean addNewCategory(String category) {
+		if(dbLink.addNewCategoryToDb(category) == 1)
+			return true;
+		return false;
+	}
+	
+	public void removeSentRequest(Pet pet) {
+		dbLink.removeAdoptionRequest(this, pet);
 	}
 	
 	
